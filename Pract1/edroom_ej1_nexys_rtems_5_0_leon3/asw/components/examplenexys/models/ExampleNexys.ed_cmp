@@ -1,0 +1,101 @@
+import "../../../protocols/EDROOMServiceLibrary/models/EDROOMServiceLibrary.ed_prot";
+import "../../../components/ccsystemmng/models/CCSystemMng.ed_cmp";
+import "../../../components/ccledmng/models/CCLEDMng.ed_cmp";
+import "../../../components/ccdisplaysmng/models/CCDisplaysMng.ed_cmp";
+
+
+
+/**
+ * \class   ExampleNexys
+ *
+ */
+
+
+no_pattern component ExampleNexys{
+
+	uri := es.uah.aut.srg.edroom.mclev.cmp.ExampleNexys;
+	version := v1;
+	stack_size := 1024;
+	def_max_nb_messages := 10;
+
+
+	structure {
+
+		ports {
+
+
+			system port EDROOMsl
+			{
+				id:= 0;
+				protocol:= EDROOMServiceLibrary(v1);
+			};
+
+
+		};
+
+
+		instances {
+
+
+			instance SystemMng
+			{
+				class := CCSystemMng(v1);
+				max_nb_messages := 11;
+				priority :=3;
+			};
+			instance LEDMng
+			{
+				class := CCLEDMng(v1);
+				max_nb_messages := 13;
+				priority :=3;
+			};
+			instance DisplaysMng
+			{
+				class := CCDisplaysMng(v1);
+				max_nb_messages := 13;
+				priority :=3;
+			};
+		};
+
+
+		connections {
+			connection SystemMng.DisplaysMngCtrl<->DisplaysMng.DisplaysMngCtrl;
+			connection SystemMng.LEDMngCtrl<->LEDMng.LEDMngCtrl;
+		};
+
+
+	};
+
+
+	behaviour {
+
+		contexts {
+
+
+			context Top_0{
+
+
+				id := 0;
+
+
+				init state := I;
+
+
+				transitions{
+
+
+				};
+
+
+			};
+
+
+		};
+
+		top context := Top_0;
+
+
+	};
+
+
+};

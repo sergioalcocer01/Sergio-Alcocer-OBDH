@@ -1,0 +1,500 @@
+import "../../../dataclasses/TEDROOMUInt8/models/TEDROOMUInt8.ed_dclass";
+import "../../../dataclasses/TEDROOMByte/models/TEDROOMByte.ed_dclass";
+import "../../../protocols/CPLEDMngCtrl/models/CPLEDMngCtrl.ed_prot";
+import "../../../protocols/CPDisplaysMngCtrl/models/CPDisplaysMngCtrl.ed_prot";
+import "../../../protocols/CPSerialCommand/models/CPSerialCommand.ed_prot";
+import "../../../protocols/EDROOMServiceLibrary/models/EDROOMServiceLibrary.ed_prot";
+import "../../../sais/nexys_gpio_drv_v1/models/nexys_gpio_drv_v1.ed_sai";
+import "../../../sais/leon3_uart_drv_v1/models/leon3_uart_drv_v1.ed_sai";
+
+
+
+/**
+ * \class   CCSystemMng
+ *
+ */
+
+
+proactive component CCSystemMng{
+
+	uri := es.uah.aut.srg.edroom.mclev.cmp.CCSystemMng;
+	version := v1;
+	stack_size := 1024;
+	def_max_nb_messages := 10;
+	requires := nexys_gpio_drv(v1),
+			leon3_uart_drv(v1);
+
+
+
+
+	structure {
+
+		ports {
+
+
+			system port EDROOMsl
+			{
+				id:= 0;
+				protocol:= EDROOMServiceLibrary(v1);
+			};
+			interrupt port SerialCommand {
+				id := 1;
+				irq vectors := 18;
+				data pool := TEDROOMByte(v1)CDEDROOMPoolTEDROOMByte[10];
+				protocol := CPSerialCommand(v1);
+
+				non_maskable := false;
+				enable_msg_to_component := true;
+				priority := 1;
+				enable_bottom_half := true;
+				top half {
+					<code>
+
+						EDROOMVarIRQ18=leon3_getchar();
+						 
+						EDROOMIRQ18BottomHalfSignal=true;
+						 
+						switch(EDROOMVarIRQ18){
+						    case('T'):
+						    case('t'):
+						    case('I'):
+						    case('i'):
+						        break;
+						 
+						  default:
+						     EDROOMIRQ18BottomHalfSignal=false;
+						}
+
+					</code>
+				};
+				bottom half {
+					<code>
+
+						 
+
+					</code>
+				};
+			};
+
+			conjugated  external port DisplaysMngCtrl {
+				id := 2;
+				cardinality := 1;
+				protocol := CPDisplaysMngCtrl(v1);
+
+			};
+
+			conjugated  external port LEDMngCtrl {
+				id := 3;
+				cardinality := 1;
+				protocol := CPLEDMngCtrl(v1);
+
+			};
+
+
+
+		};
+
+
+		data pools {
+			TEDROOMUInt8(v1) CEDROOMPoolTEDROOMUInt8[10];
+
+		};
+
+
+	};
+
+
+	behaviour {
+
+		contexts {
+
+
+			context Top_0{
+
+
+				id := 0;
+
+
+				variables {
+					variable VCommand{
+					 class := TEDROOMByte(v1);
+
+					 constructor := "'z'";
+					 dimension := 0;
+					};
+
+
+				};
+
+
+				constants {
+					constant CLEDPeriod100Ms{
+					 class := TEDROOMUInt8(v1);
+
+					 constructor := "1";
+					 dimension := 0;
+					};
+
+
+				};
+
+
+				states {
+					state I{
+						id := 0;
+					};
+					state StartUp{
+						id := 1;
+						context := StartUp_1;
+					};
+					state Ready{
+						id := 2;
+					};
+				};
+
+
+				init state := I;
+
+
+				guards{
+
+					/**
+					 * \brief  
+					 */
+
+					guard GCmdIsIncreaseDisplays {
+						<code>
+						return ((&apos;i&apos;==VCommand) || (&apos;I&apos;==VCommand));
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GCmdIsToogleLEDShift {
+						<code>
+						return ((&apos;t&apos;==VCommand) || (&apos;T&apos;==VCommand));
+
+
+						</code>
+
+					};
+
+
+				};
+
+
+				items{
+					/**
+					 * \brief  
+					 */
+
+					msgdatahandler FGetCommand {
+						code {
+							<code>
+								
+									// Data access
+								
+								VCommand=varEDROOMIRQsignal;
+
+
+							</code>
+						};
+
+						port :=SerialCommand;
+
+						message :=CPSerialCommand(v1)::EDROOMIRQsignal;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FInit {
+						<code>
+						SerialCommand.MaskIRQ();
+						 
+						SerialCommand.InstallHandler();
+						 
+						leon3_uart_ctrl_rx_irq_enable();
+						leon3_uart_ctrl_rx_enable();
+						 
+						SerialCommand.UnMaskIRQ();
+						 
+						nexys_srg_gpio_init_buttons_switches();
+						 
+						nexys_srg_gpio_init_leds_7segs_displays();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					invoke FInvokeToggleLEDShift {
+						code {
+							<code>
+
+
+							</code>
+						};
+
+						port :=LEDMngCtrl;
+
+						message :=CPLEDMngCtrl(v1)::SToggleLEDShift;
+
+						priority :=1;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FSendIncreaseDisplays {
+						code {
+							<code>
+
+
+							</code>
+						};
+
+						port :=DisplaysMngCtrl;
+
+						message :=CPDisplaysMngCtrl(v1)::SIncreaseDisplays;
+
+						priority :=3;
+
+					};
+
+
+				};
+
+
+				choice points{
+					choice point GetCommand{
+
+
+						id := 0;
+
+
+						branches{
+
+							branch GetCommand_ToggleLEDShift{
+								id := 0;
+								sink := Ready;
+
+
+								handshakes{
+									handshake{
+										invoke := FInvokeToggleLEDShift;
+									};
+								};
+
+								guard := GCmdIsToogleLEDShift;
+
+							};
+
+							branch GetCommand_IncreaseDisplays{
+								id := 1;
+								sink := Ready;
+
+
+								sends := FSendIncreaseDisplays;
+
+								guard := GCmdIsIncreaseDisplays;
+
+							};
+
+
+						};
+
+						default branch GetCommand_NotValidCommand{
+							id := 2;
+							sink := Ready;
+
+						};
+					};
+				};
+
+
+				transitions{
+
+					transition Init{
+						id := 0;
+						source := I;
+						sink := StartUp;
+
+
+						actions := FInit;
+
+
+						asynchronous trigger {
+							port := any ;
+							message := CPDisplaysMngCtrl(v1)::SDisplaysReady;
+						};
+					};
+
+					transition SubSysReady{
+						id := 1;
+						source := StartUp;
+						sink := Ready;
+
+
+
+						asynchronous trigger {
+							port := DisplaysMngCtrl;
+							message := CPDisplaysMngCtrl(v1)::SDisplaysReady;
+						};
+					};
+
+					transition GetCommand{
+						id := 2;
+						source := Ready;
+						sink := GetCommand;
+
+
+						msgdatahandler := FGetCommand;
+
+
+						asynchronous trigger {
+							port := SerialCommand;
+							message := CPSerialCommand(v1)::EDROOMIRQsignal;
+						};
+					};
+
+
+				};
+
+
+			};
+
+
+			context StartUp_1{
+
+
+				id := 1;
+
+
+				states {
+					state WaitLEDReady{
+						id := 0;
+					};
+					state WaitDisplaysReady{
+						id := 1;
+					};
+				};
+
+
+				items{
+					/**
+					 * \brief  
+					 */
+
+					send FSendDisplaysStart {
+						code {
+							<code>
+
+
+							</code>
+						};
+
+						port :=DisplaysMngCtrl;
+
+						message :=CPDisplaysMngCtrl(v1)::SDisplaysStart;
+
+						priority :=3;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FSendLEDStart {
+						code {
+							<code>
+								
+									// Complete Data 
+								
+								*pSLEDStart_Data=CLEDPeriod100Ms;
+
+
+							</code>
+						};
+
+						port :=LEDMngCtrl;
+
+						message :=CPLEDMngCtrl(v1)::SLEDStart;
+
+						priority :=3;
+
+					};
+
+
+				};
+
+
+				transitions{
+
+					transition StartLED{
+						id := 0;
+						source := Init_EntryP;
+						sink := WaitLEDReady;
+
+
+						sends := FSendLEDStart;
+					};
+
+					transition StartDisplays{
+						id := 1;
+						source := WaitLEDReady;
+						sink := WaitDisplaysReady;
+
+
+						sends := FSendDisplaysStart;
+
+
+						asynchronous trigger {
+							port := LEDMngCtrl;
+							message := CPLEDMngCtrl(v1)::SLEDReady;
+						};
+					};
+
+					transition DisplaysReady{
+						id := 2;
+						source := WaitDisplaysReady;
+						sink := SubSysReady_ExitP;
+
+
+
+						asynchronous trigger {
+							port := DisplaysMngCtrl;
+							message := CPDisplaysMngCtrl(v1)::SDisplaysReady;
+						};
+					};
+
+
+				};
+
+
+			};
+
+
+		};
+
+		top context := Top_0;
+
+
+	};
+
+
+};

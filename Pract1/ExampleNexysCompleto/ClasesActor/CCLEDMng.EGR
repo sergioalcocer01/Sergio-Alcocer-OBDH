@@ -5,8 +5,8 @@
 0
 0
 [Modificado]
-1
-1
+0
+0
 0
 [Estructura]
 [Version Estructura]
@@ -64,7 +64,7 @@ EDROOMTimingSAP
 [Pools]
 0
 [Modulos]
-1
+2
 [Version Modulo]
 1
 nexys_gpio_drv
@@ -73,6 +73,14 @@ v1
  
 1
 1
+[Version Modulo]
+1
+leon3_uart_drv
+
+v1
+
+1
+0
 [Eventos]
 1
 [Event]
