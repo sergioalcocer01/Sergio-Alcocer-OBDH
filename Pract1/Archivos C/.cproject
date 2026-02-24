@@ -26,6 +26,8 @@
 								<option defaultValue="gnu.c.debugging.level.max" id="gnu.c.compiler.option.debugging.level.1986242922" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.390341365" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="/opt/rcc-1.3.2-gcc/sparc-gaisler-rtems5/leon3/lib/include"/>
+									<listOptionValue builtIn="false" value="&quot;/home/atcsol/git/Sergio-Alcocer-OBDH/Pract1/Archivos C/asw/components/systemmng/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/edroom_ej1_nexys_rtems_5_0_leon3/asw/components/systemmng/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/llsw/nexys_gpio_drv/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/llsw/leon3_uart_drv/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/asw/edroom_glue/include}&quot;"/>

@@ -26,7 +26,10 @@ SUBDIRS := \
 asw/components/ccdisplaysmng/src \
 asw/components/ccledmng/src \
 asw/components/ccsystemmng/src \
+asw/components/displaysmng/src \
 asw/components/examplenexys/src \
+asw/components/ledmng/src \
+asw/components/systemmng/src \
 asw/edroom_glue/src \
 . \
 llsw/leon3_uart_drv/src \

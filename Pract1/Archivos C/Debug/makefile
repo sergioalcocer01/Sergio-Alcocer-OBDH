@@ -15,13 +15,14 @@ RM := rm -rf
 -include llsw/nexys_gpio_drv/src/subdir.mk
 -include llsw/leon3_uart_drv/src/subdir.mk
 -include asw/edroom_glue/src/subdir.mk
+-include asw/components/systemmng/src/subdir.mk
+-include asw/components/ledmng/src/subdir.mk
 -include asw/components/examplenexys/src/subdir.mk
+-include asw/components/displaysmng/src/subdir.mk
 -include asw/components/ccsystemmng/src/subdir.mk
 -include asw/components/ccledmng/src/subdir.mk
 -include asw/components/ccdisplaysmng/src/subdir.mk
 -include subdir.mk
--include objects.mk
-
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(C++_DEPS)),)
 -include $(C++_DEPS)
@@ -65,7 +66,7 @@ all: main-build
 main-build: edroom_ej1_nexys_rtems_5_0_leon3
 
 # Tool invocations
-edroom_ej1_nexys_rtems_5_0_leon3: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
+edroom_ej1_nexys_rtems_5_0_leon3: $(OBJS) $(USER_OBJS) makefile $(OPTIONAL_TOOL_DEPS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
 	sparc-gaisler-rtems5-g++ -mcpu=leon3 -qbsp=leon3 -msoft-float -o "edroom_ej1_nexys_rtems_5_0_leon3" $(OBJS) $(USER_OBJS) $(LIBS)
