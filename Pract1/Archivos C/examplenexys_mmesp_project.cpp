@@ -8,9 +8,9 @@
 //******************************************************************************
 // include deployment edroom components
  
-#include <public/systemmng_iface_v1.h>
-#include <public/displaysmng_iface_v1.h>
-#include <public/ledmng_iface_v1.h>
+#include <public/ccsystemmng_iface_v1.h>
+#include <public/ccledmng_iface_v1.h>
+#include <public/ccdisplaysmng_iface_v1.h>
  
 #ifdef CONFIG_EDROOMBP_DEPLOYMENT_NEED_TASK
  
@@ -20,7 +20,7 @@
  
  
  
-rtems_task Init (uint32_t arg){
+extern "C" rtems_task Init (uint32_t arg){
  
  
  
@@ -31,9 +31,9 @@ rtems_task Init (uint32_t arg){
 #endif
  
  
-	SystemMng	comp2(2, 11, EDROOMprioNormal, 1024, systemDeployment.GetComp2Memory());
-	DisplaysMng	comp3(3, 13, EDROOMprioNormal, 1024, systemDeployment.GetComp3Memory());
-	LEDMng	comp4(4, 13, EDROOMprioNormal, 1024, systemDeployment.GetComp4Memory());
+	CCSystemMng	comp2(2, 11, EDROOMprioNormal, 1024, systemDeployment.GetComp2Memory());
+	CCLEDMng	comp3(3, 13, EDROOMprioNormal, 1024, systemDeployment.GetComp3Memory());
+	CCDisplaysMng	comp4(4, 13, EDROOMprioNormal, 1024, systemDeployment.GetComp4Memory());
  
 	systemDeployment.Config(&comp2, &comp3, &comp4);
  

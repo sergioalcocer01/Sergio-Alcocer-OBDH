@@ -12,9 +12,9 @@
 //******************************************************************************
 // include deployment edroom components
  
-#include <public/systemmng_iface_v1.h>
-#include <public/displaysmng_iface_v1.h>
-#include <public/ledmng_iface_v1.h>
+#include <public/ccsystemmng_iface_v1.h>
+#include <public/ccledmng_iface_v1.h>
+#include <public/ccdisplaysmng_iface_v1.h>
 // ***********************************************************************
 // class CEDROOMSystemMemory
 // ***********************************************************************
@@ -41,9 +41,9 @@ class CEDROOMSystemMemory{
  
 	public:
  
-	SystemMng::CEDROOMMemory comp2Memory;
-	DisplaysMng::CEDROOMMemory comp3Memory;
-	LEDMng::CEDROOMMemory comp4Memory;
+	CCSystemMng::CEDROOMMemory comp2Memory;
+	CCLEDMng::CEDROOMMemory comp3Memory;
+	CCDisplaysMng::CEDROOMMemory comp4Memory;
  
 //!Set Memory
 	void SetMemory();
@@ -61,27 +61,27 @@ class CEDROOMSystemCommSAP{
  
 	CEDROOMLocalConnection connections[2];
  
-	SystemMng   * mp_comp2;
-	DisplaysMng   * mp_comp3;
-	LEDMng   * mp_comp4;
+	CCSystemMng   * mp_comp2;
+	CCLEDMng   * mp_comp3;
+	CCDisplaysMng   * mp_comp4;
  
  
 //!Set Components
  
-	void SetComponents(SystemMng   *p_comp2,
-							DisplaysMng   *p_comp3,
-							LEDMng   *p_comp4);
+	void SetComponents(CCSystemMng   *p_comp2,
+							CCLEDMng   *p_comp3,
+							CCDisplaysMng   *p_comp4);
  
  
 //Signal Conversion
  
-	static TEDROOMSignal C3DisplaysMng_PDisplaysMngCtrl__C2SystemMng_PDisplaysMngCtrl(TEDROOMSignal signal);
-	static TEDROOMSignal C2SystemMng_PDisplaysMngCtrl__C3DisplaysMng_PDisplaysMngCtrl(TEDROOMSignal signal);
+	static TEDROOMSignal C2SystemMng_PDisplaysMngCtrl__C4DisplaysMng_PDisplaysMngCtrl(TEDROOMSignal signal);
+	static TEDROOMSignal C4DisplaysMng_PDisplaysMngCtrl__C2SystemMng_PDisplaysMngCtrl(TEDROOMSignal signal);
  
 //Signal Conversion
  
-	static TEDROOMSignal C4LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtrl(TEDROOMSignal signal);
-	static TEDROOMSignal C2SystemMng_PLEDMngCtrl__C4LEDMng_PLEDMngCtrl(TEDROOMSignal signal);
+	static TEDROOMSignal C2SystemMng_PLEDMngCtrl__C3LEDMng_PLEDMngCtrl(TEDROOMSignal signal);
+	static TEDROOMSignal C3LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtrl(TEDROOMSignal signal);
  
  
 //!Register Interfaces
@@ -112,18 +112,18 @@ static Pr_TaskRV_t main_task(Pr_TaskP_t);
 	CEDROOMSystemMemory   systemMemory;
 	CEDROOMSystemCommSAP  systemCommSAP;
  
-	SystemMng   * mp_comp2;
-	DisplaysMng   * mp_comp3;
-	LEDMng   * mp_comp4;
+	CCSystemMng   * mp_comp2;
+	CCLEDMng   * mp_comp3;
+	CCDisplaysMng   * mp_comp4;
  
 	public:
  
 	CEDROOMSystemDeployment();
  
 //!Deployment Configuration
-	void Config(SystemMng   *p_comp2,
-					DisplaysMng   *p_comp3,
-					LEDMng   *p_comp4);
+	void Config(CCSystemMng   *p_comp2,
+					CCLEDMng   *p_comp3,
+					CCDisplaysMng   *p_comp4);
  
 //!Deployment Start
 	void Start();
@@ -132,9 +132,9 @@ static Pr_TaskRV_t main_task(Pr_TaskP_t);
 	void StartComponents();
 //!Config Components
  
-	SystemMng::CEDROOMMemory 		* GetComp2Memory(){return &systemMemory.comp2Memory;}
-	DisplaysMng::CEDROOMMemory 		* GetComp3Memory(){return &systemMemory.comp3Memory;}
-	LEDMng::CEDROOMMemory 		* GetComp4Memory(){return &systemMemory.comp4Memory;}
+	CCSystemMng::CEDROOMMemory 		* GetComp2Memory(){return &systemMemory.comp2Memory;}
+	CCLEDMng::CEDROOMMemory 		* GetComp3Memory(){return &systemMemory.comp3Memory;}
+	CCDisplaysMng::CEDROOMMemory 		* GetComp4Memory(){return &systemMemory.comp4Memory;}
  
 };
 #endif

@@ -1,4 +1,4 @@
-#include <public/ccledmng_iface_v1.h>
+#include <public/ccdisplaysmng_iface_v1.h>
 
 // ***********************************************************************
 
@@ -10,47 +10,33 @@
 
 	// CONSTRUCTORS***********************************************
 
-CCLEDMng::EDROOM_CTX_Top_0::EDROOM_CTX_Top_0(CCLEDMng &act,
-	 TEDROOMUInt32 & EDROOMpVarCMaxShiftPeriodMicrosecs,
-	 TEDROOMUInt8 & EDROOMpVarVLEDPos,
-	 TEDROOMBool & EDROOMpVarVShiftDirection,
-	 TEDROOMUInt32 & EDROOMpVarVShiftPeriodMicrosecs,
-	 Pr_Time & EDROOMpVarVTimeRef ):
+CCDisplaysMng::EDROOM_CTX_Top_0::EDROOM_CTX_Top_0(CCDisplaysMng &act,
+	 TEDROOMUInt8 * EDROOMpVarVDisplays7SegValue ):
 
 	EDROOMcomponent(act),
 	Msg(EDROOMcomponent.Msg),
 	MsgBack(EDROOMcomponent.MsgBack),
-	LEDMngCtrl(EDROOMcomponent.LEDMngCtrl),
+	DisplaysMngCtrl(EDROOMcomponent.DisplaysMngCtrl),
 	Timer(EDROOMcomponent.Timer),
-	CMinShiftPeriodMicrosecs(100000),
-	CMaxShiftPeriodMicrosecs(EDROOMpVarCMaxShiftPeriodMicrosecs),
-	VLEDPos(EDROOMpVarVLEDPos),
-	VShiftDirection(EDROOMpVarVShiftDirection),
-	VShiftPeriodMicrosecs(EDROOMpVarVShiftPeriodMicrosecs),
-	VTimeRef(EDROOMpVarVTimeRef)
+	VDisplays7SegValue(EDROOMpVarVDisplays7SegValue)
 {
 }
 
-CCLEDMng::EDROOM_CTX_Top_0::EDROOM_CTX_Top_0(EDROOM_CTX_Top_0 &context):
+CCDisplaysMng::EDROOM_CTX_Top_0::EDROOM_CTX_Top_0(EDROOM_CTX_Top_0 &context):
 
 	EDROOMcomponent(context.EDROOMcomponent),
 	Msg(context.Msg),
 	MsgBack(context.MsgBack),
-	LEDMngCtrl(context.LEDMngCtrl),
+	DisplaysMngCtrl(context.DisplaysMngCtrl),
 	Timer(context.Timer),
-	CMinShiftPeriodMicrosecs(100000),
-	CMaxShiftPeriodMicrosecs(context.CMaxShiftPeriodMicrosecs),
-	VLEDPos(context.VLEDPos),
-	VShiftDirection(context.VShiftDirection),
-	VShiftPeriodMicrosecs(context.VShiftPeriodMicrosecs),
-	VTimeRef(context.VTimeRef)
+	VDisplays7SegValue(context.VDisplays7SegValue)
 {
 
 }
 
 	// EDROOMSearchContextTrans********************************************
 
-bool CCLEDMng::EDROOM_CTX_Top_0::EDROOMSearchContextTrans(
+bool CCDisplaysMng::EDROOM_CTX_Top_0::EDROOMSearchContextTrans(
 			TEDROOMTransId &edroomCurrentTrans)
 			{
 
@@ -74,85 +60,52 @@ bool CCLEDMng::EDROOM_CTX_Top_0::EDROOMSearchContextTrans(
 
 	// User-defined Functions   ****************************
 
-void	CCLEDMng::EDROOM_CTX_Top_0::FGetShiftPeriod()
+void	CCDisplaysMng::EDROOM_CTX_Top_0::FIncreaseDisplays()
 
 {
-   //Handle Msg->data
-  TEDROOMUInt8 & varSLEDStart = *(TEDROOMUInt8 *)Msg->data;
- 
-// Data access
- 
-VShiftPeriodMicrosecs=varSLEDStart*100000;
- 
-//Limit Period	
-if(VShiftPeriodMicrosecs > CMaxShiftPeriodMicrosecs)
-	VShiftPeriodMicrosecs=CMaxShiftPeriodMicrosecs;
-else if (varSLEDStart < CMinShiftPeriodMicrosecs)
-	VShiftPeriodMicrosecs=CMinShiftPeriodMicrosecs;
- 
-//Get Time reference
-VTimeRef.GetTime();
+
+nexys_srg_gpio_increase_seg_7seg_array(VDisplays7SegValue);
 
 }
 
 
 
-void	CCLEDMng::EDROOM_CTX_Top_0::FProgShift()
+void	CCDisplaysMng::EDROOM_CTX_Top_0::FProgDisplaysRefresh()
 
 {
-   //Define absolute time
-  Pr_Time time;
- 
- 
- VTimeRef+=Pr_Time(0,VShiftPeriodMicrosecs); // interval of X sec + Y microsec	 
-  
- time= VTimeRef;
-   //Program absolute timer 
-   Timer.InformAt( time ); 
+   //Define interval
+  Pr_Time interval;
+	 
+	//Timing Service useful methods
+	 
+interval = Pr_Time(0,1000);
+   //Program relative timer 
+   Timer.InformIn( interval ); 
 }
 
 
 
-void	CCLEDMng::EDROOM_CTX_Top_0::FReplyLEDShiftToggled()
+void	CCDisplaysMng::EDROOM_CTX_Top_0::FRefreshDisplays()
 
 {
 
-VShiftDirection=!VShiftDirection;
-   //Reply synchronous communication
-   Msg->reply(SLEDShiftToggled); 
+for(uint16_t i=0; i < 1000 ; i++ )
+	nexys_srg_gpio_seg_7seg_array(8,VDisplays7SegValue);
+
 }
 
 
 
-void	CCLEDMng::EDROOM_CTX_Top_0::FSendLEDReady()
+void	CCDisplaysMng::EDROOM_CTX_Top_0::FSendDisplaysReady()
 
 {
 
+for(uint8_t i=0; i < 8 ; i++)
+	VDisplays7SegValue[i]=0;
+ 
+nexys_srg_gpio_set_7seg_digit(7, 0) ;
    //Send message 
-   LEDMngCtrl.send(SLEDReady); 
-}
-
-
-
-void	CCLEDMng::EDROOM_CTX_Top_0::FShiftLEDs()
-
-{
-
-nexys_srg_gpio_turn_off_led(VLEDPos);
- 
-if(VShiftDirection){
- 
-	VLEDPos=(VLEDPos + 1)%10;
-}else{
-	if(VLEDPos){
-		VLEDPos--;
-	}else{
-		VLEDPos=9;
-	}
-}
- 
-nexys_srg_gpio_turn_on_led(VLEDPos);
-
+   DisplaysMngCtrl.send(SDisplaysReady); 
 }
 
 
@@ -171,24 +124,16 @@ nexys_srg_gpio_turn_on_led(VLEDPos);
 
 	// CONSTRUCTOR*************************************************
 
-CCLEDMng::EDROOM_SUB_Top_0::EDROOM_SUB_Top_0 (CCLEDMng&act):
+CCDisplaysMng::EDROOM_SUB_Top_0::EDROOM_SUB_Top_0 (CCDisplaysMng&act):
 		EDROOM_CTX_Top_0(act,
-			CMaxShiftPeriodMicrosecs,
-			VLEDPos,
-			VShiftDirection,
-			VShiftPeriodMicrosecs,
-			VTimeRef),
-		CMaxShiftPeriodMicrosecs(900000),
-		VLEDPos(0),
-		VShiftDirection(0),
-		VShiftPeriodMicrosecs(100000)
+			VDisplays7SegValue)
 {
 
 }
 
 	//***************************** EDROOMBehaviour ********************************
 
-void CCLEDMng::EDROOM_SUB_Top_0::EDROOMBehaviour()
+void CCDisplaysMng::EDROOM_SUB_Top_0::EDROOMBehaviour()
 {
 
 	TEDROOMTransId edroomCurrentTrans;
@@ -212,27 +157,24 @@ void CCLEDMng::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				break;
 			//Next Transition is Start
 			case (Start):
-				//Msg->Data Handling 
-				FGetShiftPeriod();
 				//Execute Action 
-				FProgShift();
+				FProgDisplaysRefresh();
 				//Send Asynchronous Message 
-				FSendLEDReady();
+				FSendDisplaysReady();
 				//Next State is Ready
 				edroomNextState = Ready;
 				break;
-			//Next Transition is ShiftTimeout
-			case (ShiftTimeout):
-				//Execute Actions 
-				FShiftLEDs();
-				FProgShift();
+			//Next Transition is RefreshDisplays
+			case (RefreshDisplays):
+				//Execute Action 
+				FProgDisplaysRefresh();
 				//Next State is Ready
 				edroomNextState = Ready;
 				break;
-			//Next Transition is ToggleShift
-			case (ToggleShift):
-				//Reply Synchronous Message 
-				FReplyLEDShiftToggled();
+			//Next Transition is IncreaseDisplays
+			case (IncreaseDisplays):
+				//Execute Action 
+				FIncreaseDisplays();
 				//Next State is Ready
 				edroomNextState = Ready;
 				break;
@@ -256,6 +198,8 @@ void CCLEDMng::EDROOM_SUB_Top_0::EDROOMBehaviour()
 
 				//Go to the state Ready
 			case (Ready):
+				//Execute Entry Action 
+				FRefreshDisplays();
 				//Arrival to state Ready
 				edroomCurrentTrans=EDROOMReadyArrival();
 				break;
@@ -272,7 +216,7 @@ void CCLEDMng::EDROOM_SUB_Top_0::EDROOMBehaviour()
 
 	// Context Init**********************************************
 
-void CCLEDMng::EDROOM_SUB_Top_0::EDROOMInit()
+void CCDisplaysMng::EDROOM_SUB_Top_0::EDROOMInit()
 {
 
 edroomCurrentState=I;
@@ -289,7 +233,7 @@ edroomCurrentState=I;
 
 
 
-TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMIArrival()
+TEDROOMTransId CCDisplaysMng::EDROOM_SUB_Top_0::EDROOMIArrival()
 {
 
 	TEDROOMTransId edroomCurrentTrans;
@@ -311,7 +255,7 @@ TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMIArrival()
 
 
 
-TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMIdleArrival()
+TEDROOMTransId CCDisplaysMng::EDROOM_SUB_Top_0::EDROOMIdleArrival()
 {
 
 	TEDROOMTransId edroomCurrentTrans;
@@ -326,9 +270,9 @@ TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMIdleArrival()
 		switch(Msg->signal)
 		{
 
-			case (SLEDStart): 
+			case (SDisplaysStart): 
 
-				 if (*Msg->GetPInterface() == LEDMngCtrl)
+				 if (*Msg->GetPInterface() == DisplaysMngCtrl)
 				{
 
 					//Next transition is  Start
@@ -363,7 +307,7 @@ TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMIdleArrival()
 
 
 
-TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMReadyArrival()
+TEDROOMTransId CCDisplaysMng::EDROOM_SUB_Top_0::EDROOMReadyArrival()
 {
 
 	TEDROOMTransId edroomCurrentTrans;
@@ -383,21 +327,21 @@ TEDROOMTransId CCLEDMng::EDROOM_SUB_Top_0::EDROOMReadyArrival()
 				 if (*Msg->GetPInterface() == Timer)
 				{
 
-					//Next transition is  ShiftTimeout
-					edroomCurrentTrans.localId= ShiftTimeout;
+					//Next transition is  RefreshDisplays
+					edroomCurrentTrans.localId= RefreshDisplays;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
 
 				break;
 
-			case (SToggleLEDShift): 
+			case (SIncreaseDisplays): 
 
-				 if (*Msg->GetPInterface() == LEDMngCtrl)
+				 if (*Msg->GetPInterface() == DisplaysMngCtrl)
 				{
 
-					//Next transition is  ToggleShift
-					edroomCurrentTrans.localId= ToggleShift;
+					//Next transition is  IncreaseDisplays
+					edroomCurrentTrans.localId= IncreaseDisplays;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }

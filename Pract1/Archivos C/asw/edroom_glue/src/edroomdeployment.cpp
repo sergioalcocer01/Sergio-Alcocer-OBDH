@@ -8,9 +8,9 @@
 //*****************************************************************************
 //Main Wait
  
-void MainWait(SystemMng   &comp2,
-					DisplaysMng   &comp3,
-					LEDMng   &comp4){
+void MainWait(CCSystemMng   &comp2,
+					CCLEDMng   &comp3,
+					CCDisplaysMng   &comp4){
  
 	Pr_Time waitTime(3, 0);
  
@@ -42,9 +42,9 @@ void CEDROOMSystemMemory::SetMemory(){
 //*****************************************************************************
 //SetComponents
  
-void CEDROOMSystemCommSAP::SetComponents(SystemMng   *p_comp2,
-										DisplaysMng   *p_comp3,
-										LEDMng   *p_comp4){
+void CEDROOMSystemCommSAP::SetComponents(CCSystemMng   *p_comp2,
+										CCLEDMng   *p_comp3,
+										CCDisplaysMng   *p_comp4){
 	mp_comp2=p_comp2;
 	mp_comp3=p_comp3;
 	mp_comp4=p_comp4;
@@ -58,13 +58,15 @@ void CEDROOMSystemCommSAP::SetComponents(SystemMng   *p_comp2,
 //*****************************************************************************
  
  
-TEDROOMSignal CEDROOMSystemCommSAP::C3DisplaysMng_PDisplaysMngCtrl__C2SystemMng_PDisplaysMngCtrl(TEDROOMSignal signalOut){
+TEDROOMSignal CEDROOMSystemCommSAP::C2SystemMng_PDisplaysMngCtrl__C4DisplaysMng_PDisplaysMngCtrl(TEDROOMSignal signalOut){
  
 	TEDROOMSignal signalIn;
  
 	switch(signalOut){
  
-		case( DisplaysMng::SDisplaysReady):	 signalIn=SystemMng::SDisplaysReady; break;
+		case( CCSystemMng::SDisplaysStart):	 signalIn=CCDisplaysMng::SDisplaysStart; break;
+ 
+		case( CCSystemMng::SIncreaseDisplays):	 signalIn=CCDisplaysMng::SIncreaseDisplays; break;
  
 		default: signalIn=(TEDROOMSignal)(-1); break;
  
@@ -73,15 +75,13 @@ TEDROOMSignal CEDROOMSystemCommSAP::C3DisplaysMng_PDisplaysMngCtrl__C2SystemMng_
  
 }
  
-TEDROOMSignal CEDROOMSystemCommSAP::C2SystemMng_PDisplaysMngCtrl__C3DisplaysMng_PDisplaysMngCtrl(TEDROOMSignal signalOut){
+TEDROOMSignal CEDROOMSystemCommSAP::C4DisplaysMng_PDisplaysMngCtrl__C2SystemMng_PDisplaysMngCtrl(TEDROOMSignal signalOut){
  
 	TEDROOMSignal signalIn;
  
 	switch(signalOut){
  
-		case( SystemMng::SDisplaysStart):	 signalIn=DisplaysMng::SDisplaysStart; break;
- 
-		case( SystemMng::SIncreaseDisplays):	 signalIn=DisplaysMng::SIncreaseDisplays; break;
+		case( CCDisplaysMng::SDisplaysReady):	 signalIn=CCSystemMng::SDisplaysReady; break;
  
 		default: signalIn=(TEDROOMSignal)(-1); break;
  
@@ -90,15 +90,15 @@ TEDROOMSignal CEDROOMSystemCommSAP::C2SystemMng_PDisplaysMngCtrl__C3DisplaysMng_
  
 }
  
-TEDROOMSignal CEDROOMSystemCommSAP::C4LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtrl(TEDROOMSignal signalOut){
+TEDROOMSignal CEDROOMSystemCommSAP::C2SystemMng_PLEDMngCtrl__C3LEDMng_PLEDMngCtrl(TEDROOMSignal signalOut){
  
 	TEDROOMSignal signalIn;
  
 	switch(signalOut){
  
-		case( LEDMng::SLEDReady):	 signalIn=SystemMng::SLEDReady; break;
+		case( CCSystemMng::SLEDStart):	 signalIn=CCLEDMng::SLEDStart; break;
  
-		case( LEDMng::SLEDShiftToggled):	 signalIn=SystemMng::SLEDShiftToggled; break;
+		case( CCSystemMng::SToggleLEDShift):	 signalIn=CCLEDMng::SToggleLEDShift; break;
  
 		default: signalIn=(TEDROOMSignal)(-1); break;
  
@@ -107,15 +107,15 @@ TEDROOMSignal CEDROOMSystemCommSAP::C4LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtr
  
 }
  
-TEDROOMSignal CEDROOMSystemCommSAP::C2SystemMng_PLEDMngCtrl__C4LEDMng_PLEDMngCtrl(TEDROOMSignal signalOut){
+TEDROOMSignal CEDROOMSystemCommSAP::C3LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtrl(TEDROOMSignal signalOut){
  
 	TEDROOMSignal signalIn;
  
 	switch(signalOut){
  
-		case( SystemMng::SLEDStart):	 signalIn=LEDMng::SLEDStart; break;
+		case( CCLEDMng::SLEDReady):	 signalIn=CCSystemMng::SLEDReady; break;
  
-		case( SystemMng::SToggleLEDShift):	 signalIn=LEDMng::SToggleLEDShift; break;
+		case( CCLEDMng::SLEDShiftToggled):	 signalIn=CCSystemMng::SLEDShiftToggled; break;
  
 		default: signalIn=(TEDROOMSignal)(-1); break;
  
@@ -138,11 +138,11 @@ void CEDROOMSystemCommSAP::RegisterInterfaces(){
  
 	// Register Interface for Component 3
 	m_localCommSAP.RegisterInterface(1, mp_comp3->Timer, mp_comp3);
-	m_localCommSAP.RegisterInterface(2, mp_comp3->DisplaysMngCtrl, mp_comp3);
+	m_localCommSAP.RegisterInterface(2, mp_comp3->LEDMngCtrl, mp_comp3);
  
 	// Register Interface for Component 4
 	m_localCommSAP.RegisterInterface(1, mp_comp4->Timer, mp_comp4);
-	m_localCommSAP.RegisterInterface(2, mp_comp4->LEDMngCtrl, mp_comp4);
+	m_localCommSAP.RegisterInterface(2, mp_comp4->DisplaysMngCtrl, mp_comp4);
  
 }
  
@@ -152,13 +152,13 @@ void CEDROOMSystemCommSAP::RegisterInterfaces(){
  
 void CEDROOMSystemCommSAP::SetLocalConnections(){
  
-	m_localCommSAP.Connect(mp_comp3->DisplaysMngCtrl, mp_comp2->DisplaysMngCtrl, connections[0], 
-					C3DisplaysMng_PDisplaysMngCtrl__C2SystemMng_PDisplaysMngCtrl, 
-					C2SystemMng_PDisplaysMngCtrl__C3DisplaysMng_PDisplaysMngCtrl);
+	m_localCommSAP.Connect(mp_comp2->DisplaysMngCtrl, mp_comp4->DisplaysMngCtrl, connections[0], 
+					C2SystemMng_PDisplaysMngCtrl__C4DisplaysMng_PDisplaysMngCtrl, 
+					C4DisplaysMng_PDisplaysMngCtrl__C2SystemMng_PDisplaysMngCtrl);
  
-	m_localCommSAP.Connect(mp_comp4->LEDMngCtrl, mp_comp2->LEDMngCtrl, connections[1], 
-					C4LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtrl, 
-					C2SystemMng_PLEDMngCtrl__C4LEDMng_PLEDMngCtrl);
+	m_localCommSAP.Connect(mp_comp2->LEDMngCtrl, mp_comp3->LEDMngCtrl, connections[1], 
+					C2SystemMng_PLEDMngCtrl__C3LEDMng_PLEDMngCtrl, 
+					C3LEDMng_PLEDMngCtrl__C2SystemMng_PLEDMngCtrl);
  
 }
  
@@ -194,9 +194,9 @@ CEDROOMSystemDeployment::CEDROOMSystemDeployment(){
 //*****************************************************************************
 ////Config
  
-void CEDROOMSystemDeployment::Config(SystemMng   *p_comp2,
-											DisplaysMng   *p_comp3,
-											LEDMng   *p_comp4){
+void CEDROOMSystemDeployment::Config(CCSystemMng   *p_comp2,
+											CCLEDMng   *p_comp3,
+											CCDisplaysMng   *p_comp4){
  
 	mp_comp2=p_comp2;
 	mp_comp3=p_comp3;
