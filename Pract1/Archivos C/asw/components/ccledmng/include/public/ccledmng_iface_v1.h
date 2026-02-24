@@ -12,6 +12,7 @@
 // Required software interfaces
 
 #include <public/nexys_gpio_drv_v1.h>
+#include <public/leon3_uart_drv_v1.h>
 
 
 /**
