@@ -1,0 +1,59 @@
+[Version Protocolo]
+9
+0
+0
+0
+0
+1
+2
+[Version Mensaje]
+1
+[Version Senal]
+0
+SToggleLEDShift
+[Version Dato]
+1
+NULL
+C:\Users\o.rodriguez\Documents\EDROOM\Models\ExampleNexys\
+es.uah.aut.srg.edroom.mclev.data_sai.NULL
+v1
+1
+[Version Mensaje]
+1
+[Version Senal]
+0
+SLEDStart
+[Version Dato]
+1
+TEDROOMUInt8
+C:\Users\o.rodriguez\Documents\EDROOM\Models\ExampleNexys\
+es.uah.aut.srg.edroom.mclev.data_sai.TEDROOMUInt8
+v1
+0
+2
+[Version Mensaje]
+1
+[Version Senal]
+0
+SLEDShiftToggled
+[Version Dato]
+1
+NULL
+C:\Users\o.rodriguez\Documents\EDROOM\Models\ExampleNexys\
+es.uah.aut.srg.edroom.mclev.data_sai.NULL
+v1
+2
+SToggleLEDShift
+[Version Mensaje]
+1
+[Version Senal]
+0
+SLEDReady
+[Version Dato]
+1
+NULL
+C:\Users\o.rodriguez\Documents\EDROOM\Models\ExampleNexys\
+es.uah.aut.srg.edroom.mclev.data_sai.NULL
+v1
+0
+0

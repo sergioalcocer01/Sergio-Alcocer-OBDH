@@ -1,0 +1,393 @@
+[Version Actor SW]
+5
+0
+0
+0
+0
+[Modificado]
+0
+0
+0
+[Estructura]
+[Version Estructura]
+3
+[Parametro]
+NULL
+ 
+ 
+[FinParametro]
+[Stack]
+1
+[FinStack]
+[Puertos]
+2
+[Version Puerto]
+0
+LEDMngCtrl
+0
+1
+0
+[Version Grafico Puerto]
+0
+4
+45
+CPLEDMngCtrl
+[Version Puerto]
+0
+Timer
+0
+1
+1
+[Version Grafico Puerto]
+0
+46
+32
+EDROOMTimingSAP
+[FinPuertos]
+[ActoresComponente]
+0
+[FinActoresComponente]
+[Uniones]
+0
+[FinUniones]
+[NumTimers]
+2
+[FinNumTimers]
+[NumMsgDef]
+10
+[FinNumMsgDef]
+[FinEstructura]
+[Comportamiento]
+[Version Comportamiento]
+3
+0
+[Pools]
+0
+[Modulos]
+1
+[Version Modulo]
+1
+nexys_gpio_drv
+
+v1
+
+1
+0
+[Eventos]
+1
+[Event]
+[Version]
+1
+EvTimerTimer
+Timer
+[Maquina de Estados]
+[Version Maquina de Estados]
+1
+Top
+NULL
+[Subestados]
+3
+[Version SubEstados]
+3
+I
+;
+;
+;
+;
+;
+0
+0
+[ObjetoGrafico]
+[Version Objeto Grafico]
+0
+73 73 55 55
+[FinObjetoGrafico]
+Idle
+;
+;
+;
+;
+;
+1
+0
+[ObjetoGrafico]
+[Version Objeto Grafico]
+0
+155 264 90 60
+[FinObjetoGrafico]
+Ready
+;
+;
+;
+;
+;
+1
+0
+[ObjetoGrafico]
+[Version Objeto Grafico]
+0
+345 240 184 114
+[FinObjetoGrafico]
+[PuntosEleccion]
+0
+[Version PuntosEleccion]
+2
+[Transiciones]
+4
+[Version Transicion]
+5
+Init
+I
+OSubEstI
+Idle
+DSubEst
+;
+[Trigger]
+EDROOMsl
+EDROOMStart
+true
+ 
+ 
+ 
+;
+;
+;
+0
+;
+[GraficoTransicion]
+[Version GraficoTransicion]
+0
+111 123 194 264 0
+[FinGraficoTransicion]
+Start
+Idle
+OSubEst
+Ready
+DSubEst
+FProgShift();
+[Trigger]
+LEDMngCtrl
+SLEDStart
+true
+ 
+ 
+ 
+FGetShiftPeriod();
+FSendLEDReady();
+;
+0
+;
+[GraficoTransicion]
+[Version GraficoTransicion]
+0
+245 294 345 296 0
+[FinGraficoTransicion]
+ShiftTimeout
+Ready
+OSubEst
+Ready
+DSubEst
+FCShiftTimeout();
+[Trigger]
+Timer
+EDROOMSignalTimeout
+true
+ 
+ 
+ 
+;
+;
+;
+0
+;
+[GraficoTransicion]
+[Version GraficoTransicion]
+0
+369 240 509 240 4
+[FinGraficoTransicion]
+ToggleShift
+Ready
+OSubEst
+Ready
+DSubEst
+;
+[Trigger]
+LEDMngCtrl
+SToggleLEDShift
+true
+ 
+ 
+ 
+;
+;
+FReplyLEDShiftToggled();
+1
+;
+[GraficoTransicion]
+[Version GraficoTransicion]
+0
+368 354 515 354 5
+[FinGraficoTransicion]
+[VariablesConstantes]
+6
+[Version VariYConst]
+0
+CMaxShiftPeriodMicrosecs
+TEDROOMUInt32
+900000
+Variable
+0
+[Version VariYConst]
+0
+CMinShiftPeriodMicrosecs
+TEDROOMUInt32
+100000
+Constante
+0
+[Version VariYConst]
+0
+VLEDPos
+TEDROOMUInt8
+0
+Variable
+0
+[Version VariYConst]
+0
+VShiftPeriodMicrosecs
+TEDROOMUInt32
+100000
+Variable
+0
+[Version VariYConst]
+0
+VTimeRef
+Pr_Time
+
+Variable
+0
+[Version VariYConst]
+0
+VShiftDirection
+TEDROOMBool
+0
+Variable
+0
+[Metodos]
+6
+[Version Metodos]
+21
+CompositeAction
+FCShiftTimeout()
+0
+0
+0
+2
+FShiftLEDs();
+FProgShift();
+MsgDataHandler
+FGetShiftPeriod()
+0
+0
+0
+0
+1
+ 
+13
+ 
+// Data access
+ 
+VShiftPeriodMicrosecs=varSLEDStart*100000;
+ 
+//Limit Period	
+if(VShiftPeriodMicrosecs > CMaxShiftPeriodMicrosecs)
+	VShiftPeriodMicrosecs=CMaxShiftPeriodMicrosecs;
+else if (varSLEDStart < CMinShiftPeriodMicrosecs)
+	VShiftPeriodMicrosecs=CMinShiftPeriodMicrosecs;
+ 
+//Get Time reference
+VTimeRef.GetTime();
+[ServiceRequest]
+Msg->data
+LEDMngCtrl
+SLEDStart
+TEDROOMUInt8
+EDROOMprioNormal
+Inform
+FProgShift()
+0
+0
+0
+0
+1
+ 
+5
+ 
+ 
+ VTimeRef+=Pr_Time(0,VShiftPeriodMicrosecs); // interval of X sec + Y microsec	 
+  
+ time= VTimeRef;
+[ServiceRequest]
+InformAt
+Timer
+EDROOMSignalTimeout
+TEDROOMUInt8
+EDROOMprioNormal
+ReplyMsg
+FReplyLEDShiftToggled()
+0
+0
+0
+0
+1
+ 
+1
+VShiftDirection=!VShiftDirection;
+[ServiceRequest]
+Msg->reply
+LEDMngCtrl
+SLEDShiftToggled
+NULL
+EDROOMprioVeryHigh
+SendMsg
+FSendLEDReady()
+0
+0
+0
+0
+1
+ 
+0
+[ServiceRequest]
+send
+LEDMngCtrl
+SLEDReady
+NULL
+EDROOMprioNormal
+BasicAction
+FShiftLEDs()
+0
+0
+0
+0
+1
+ 
+14
+nexys_srg_gpio_turn_off_led(VLEDPos);
+ 
+if(VShiftDirection){
+ 
+	VLEDPos=(VLEDPos + 1)%10;
+}else{
+	if(VLEDPos){
+		VLEDPos--;
+	}else{
+		VLEDPos=9;
+	}
+}
+ 
+nexys_srg_gpio_turn_on_led(VLEDPos);
+[MaquinasSubEstados]
+0
+[FinMaquinasSubEstados]
+[Fin Maquina de Estados]
+[FinComportamiento]
