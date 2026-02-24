@@ -1,0 +1,253 @@
+import "../../../dataclasses/TEDROOMUInt8/models/TEDROOMUInt8.ed_dclass";
+import "../../../protocols/CPDisplaysMngCtrl/models/CPDisplaysMngCtrl.ed_prot";
+import "../../../protocols/EDROOMTimingSAP/models/EDROOMTimingSAP.ed_prot";
+import "../../../protocols/EDROOMServiceLibrary/models/EDROOMServiceLibrary.ed_prot";
+import "../../../sais/nexys_gpio_drv_v1/models/nexys_gpio_drv_v1.ed_sai";
+
+
+
+/**
+ * \class   CCDisplaysMng
+ *
+ */
+
+
+reactive component CCDisplaysMng{
+
+	uri := es.uah.aut.srg.edroom.mclev.cmp.CCDisplaysMng;
+	version := v1;
+	stack_size := 1024;
+	def_max_nb_messages := 10;
+	requires := nexys_gpio_drv(v1);
+
+
+
+
+	structure {
+
+		ports {
+
+
+			system port EDROOMsl
+			{
+				id:= 0;
+				protocol:= EDROOMServiceLibrary(v1);
+			};
+			timing port Timer {
+				id := 1;
+				protocol := EDROOMTimingSAP(v1);
+
+			};
+
+			external port DisplaysMngCtrl {
+				id := 2;
+				cardinality := 1;
+				protocol := CPDisplaysMngCtrl(v1);
+
+			};
+
+
+
+		};
+
+
+	};
+
+
+	behaviour {
+
+		contexts {
+
+
+			context Top_0{
+
+
+				id := 0;
+
+
+				variables {
+					variable VDisplays7SegValue{
+					 class := TEDROOMUInt8(v1);
+
+					 constructor := "";
+					 dimension := 8;
+					};
+
+
+				};
+
+
+				states {
+					state I{
+						id := 0;
+					};
+					state Idle{
+						id := 1;
+					};
+					state Ready{
+						id := 2;
+
+						entry actions := FRefreshDisplays;
+					};
+				};
+
+
+				init state := I;
+
+
+				items{
+					/**
+					 * \brief  
+					 */
+
+					action FIncreaseDisplays {
+						<code>
+						nexys_srg_gpio_increase_seg_7seg_array(VDisplays7SegValue);
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					inform in FProgDisplaysRefresh {
+						code {
+							<code>
+								 
+								//Timing Service useful methods
+								 
+							interval = Pr_Time(0,1000);
+
+
+							</code>
+						};
+
+						port :=Timer;
+
+						priority :=3;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FRefreshDisplays {
+						<code>
+						for(uint16_t i=0; i &lt; 1000 ; i++ )
+							nexys_srg_gpio_seg_7seg_array(8,VDisplays7SegValue);
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FSendDisplaysReady {
+						code {
+							<code>
+							for(uint8_t i=0; i &lt; 8 ; i++)
+								VDisplays7SegValue[i]=0;
+							 
+							nexys_srg_gpio_set_7seg_digit(7, 0) ;
+
+
+							</code>
+						};
+
+						port :=DisplaysMngCtrl;
+
+						message :=CPDisplaysMngCtrl(v1)::SDisplaysReady;
+
+						priority :=3;
+
+					};
+
+
+				};
+
+
+				transitions{
+
+					transition Init{
+						id := 0;
+						source := I;
+						sink := Idle;
+
+
+
+						asynchronous trigger {
+							port := EDROOMsl;
+							message := EDROOMServiceLibrary(v1)::EDROOMStart;
+						};
+					};
+
+					transition Start{
+						id := 1;
+						source := Idle;
+						sink := Ready;
+
+
+						actions := FProgDisplaysRefresh;
+
+						sends := FSendDisplaysReady;
+
+
+						asynchronous trigger {
+							port := DisplaysMngCtrl;
+							message := CPDisplaysMngCtrl(v1)::SDisplaysStart;
+						};
+					};
+
+					transition RefreshDisplays{
+						id := 2;
+						source := Ready;
+						sink := Ready;
+
+
+						actions := FProgDisplaysRefresh;
+
+
+						asynchronous trigger {
+							port := Timer;
+							message := EDROOMTimingSAP(v1)::EDROOMSignalTimeout;
+						};
+					};
+
+					transition IncreaseDisplays{
+						id := 3;
+						source := Ready;
+						sink := Ready;
+
+
+						actions := FIncreaseDisplays;
+
+
+						asynchronous trigger {
+							port := DisplaysMngCtrl;
+							message := CPDisplaysMngCtrl(v1)::SIncreaseDisplays;
+						};
+					};
+
+
+				};
+
+
+			};
+
+
+		};
+
+		top context := Top_0;
+
+
+	};
+
+
+};

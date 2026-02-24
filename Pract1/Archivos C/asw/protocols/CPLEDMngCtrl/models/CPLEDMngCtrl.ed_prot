@@ -1,0 +1,63 @@
+import "../../../dataclasses/TEDROOMUInt8/models/TEDROOMUInt8.ed_dclass";
+
+
+/*
+ * EDROOM Protocol Model.
+*/ 
+
+
+protocol CPLEDMngCtrl{
+
+	uri :=es.uah.aut.srg.edroom.mclev.cmp_iface.CPLEDMngCtrl;
+	version :=v1;
+
+
+	/*
+	 * Input messages.
+	*/ 
+
+	input messages
+
+	{
+
+
+		/*
+		 * Asynchronous messages.
+		*/ 
+
+		send SLEDStart(TEDROOMUInt8(v1));
+
+		/*
+		 * Synchronous Invoke messages.
+		*/ 
+
+		invoke SToggleLEDShift() replies SLEDShiftToggled;
+
+	};
+
+
+
+	/*
+	 * Output messages.
+	*/ 
+
+	output messages
+
+	{
+
+
+		/*
+		 * Asynchronous messages.
+		*/ 
+
+		send SLEDReady();
+
+		/*
+		 * Synchronous reply messages.
+		*/ 
+
+		reply SLEDShiftToggled();
+
+	};
+
+};

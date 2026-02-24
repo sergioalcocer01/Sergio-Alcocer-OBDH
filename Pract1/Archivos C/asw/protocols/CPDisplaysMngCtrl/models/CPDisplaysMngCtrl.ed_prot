@@ -1,0 +1,51 @@
+
+
+/*
+ * EDROOM Protocol Model.
+*/ 
+
+
+protocol CPDisplaysMngCtrl{
+
+	uri :=es.uah.aut.srg.edroom.mclev.cmp_iface.CPDisplaysMngCtrl;
+	version :=v1;
+
+
+	/*
+	 * Input messages.
+	*/ 
+
+	input messages
+
+	{
+
+
+		/*
+		 * Asynchronous messages.
+		*/ 
+
+		send SDisplaysStart();
+		send SIncreaseDisplays();
+
+	};
+
+
+
+	/*
+	 * Output messages.
+	*/ 
+
+	output messages
+
+	{
+
+
+		/*
+		 * Asynchronous messages.
+		*/ 
+
+		send SDisplaysReady();
+
+	};
+
+};
