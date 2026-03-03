@@ -1,0 +1,16 @@
+service_libraries/edroomsl/edroombp/src/rtemsapi_5_1/rtems_5_1/edroombp.o: \
+ ../service_libraries/edroomsl/edroombp/src/rtemsapi_5_1/rtems_5_1/edroombp.cpp \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/service_libraries/edroomsl/edroombp/include/edroombp_swr/rtemsapi_5_1/rtems_5_1/edroombp.h \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/llsw/config/include/public/config.h \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/asw/edroom_glue/include/edroom_glue/edroomdf.h \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/service_libraries/edroomsl/edroombp/include/edroombp_swr/rtemsapi_5_1/rtems_5_1/../../edroomtypes.h \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/llsw/config/include/public/basic_types.h \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/service_libraries/edroomsl/edroombp/include/edroombp_swr/rtemsapi_5_1/rtems_5_1/leon3/leon3_hw_irqs.h \
+ /home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/llsw/rtems_osswr/include/rtems_config.h
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/service_libraries/edroomsl/edroombp/include/edroombp_swr/rtemsapi_5_1/rtems_5_1/edroombp.h:
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/llsw/config/include/public/config.h:
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/asw/edroom_glue/include/edroom_glue/edroomdf.h:
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/service_libraries/edroomsl/edroombp/include/edroombp_swr/rtemsapi_5_1/rtems_5_1/../../edroomtypes.h:
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/llsw/config/include/public/basic_types.h:
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/service_libraries/edroomsl/edroombp/include/edroombp_swr/rtemsapi_5_1/rtems_5_1/leon3/leon3_hw_irqs.h:
+/home/atcsol/git/Sergio-Alcocer-OBDH/Pract2/asw_pus_rtems_5_0_leon3_st01_st17/llsw/rtems_osswr/include/rtems_config.h:

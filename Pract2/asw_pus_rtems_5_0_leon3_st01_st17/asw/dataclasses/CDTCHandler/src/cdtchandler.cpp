@@ -57,9 +57,9 @@ CDTCExecCtrl CDTCHandler::GetExecCtrl() {
 	switch (type) {
 
 	//TODO 05 Set ST[17,X] as prioTC
-	//case (  ):
-		//execCtrl.mExecCtrl = ExecCtrlPrioTC;
-		//break;
+	case (17):
+		execCtrl.mExecCtrl = ExecCtrlPrioTC;
+		break;
 
 	default:
 
@@ -85,9 +85,9 @@ void CDTCHandler::ExecPrioTC() {
 
 		//TODO 07 call pus_service17_exec_tc(&mTCHandler);
 
-		//case (  ):
-			//pus_serviceXX_exec_tc(&mTCHandler);
-			//break;
+		case (17):
+			pus_service17_exec_tc(&mTCHandler);
+			break;
 
 		default:
 			//No defined code for this TC. Design error
