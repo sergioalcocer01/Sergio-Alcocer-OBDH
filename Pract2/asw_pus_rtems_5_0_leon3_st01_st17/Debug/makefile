@@ -39,8 +39,6 @@ RM := rm -rf
 -include asw/components/uah_asw/src/subdir.mk
 -include asw/components/cctcmanager/src/subdir.mk
 -include subdir.mk
--include objects.mk
-
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(C++_DEPS)),)
 -include $(C++_DEPS)
@@ -70,7 +68,7 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := asw_pus_rtems_5_0_leon3_st01_st17_2026
+BUILD_ARTIFACT_NAME := asw_pus_rtems_5_0_leon3_st01_st17
 BUILD_ARTIFACT_EXTENSION :=
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
@@ -81,19 +79,19 @@ BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ART
 all: main-build
 
 # Main-build Target
-main-build: asw_pus_rtems_5_0_leon3_st01_st17_2026
+main-build: asw_pus_rtems_5_0_leon3_st01_st17
 
 # Tool invocations
-asw_pus_rtems_5_0_leon3_st01_st17_2026: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
+asw_pus_rtems_5_0_leon3_st01_st17: $(OBJS) $(USER_OBJS) makefile $(OPTIONAL_TOOL_DEPS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	sparc-gaisler-rtems5-g++ -mcpu=leon3 -qbsp=leon3 -msoft-float -o "asw_pus_rtems_5_0_leon3_st01_st17_2026" $(OBJS) $(USER_OBJS) $(LIBS)
+	sparc-gaisler-rtems5-g++ -mcpu=leon3 -qbsp=leon3 -msoft-float -o "asw_pus_rtems_5_0_leon3_st01_st17" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) asw_pus_rtems_5_0_leon3_st01_st17_2026
+	-$(RM) asw_pus_rtems_5_0_leon3_st01_st17
 	-@echo ' '
 
 .PHONY: all clean dependents main-build

@@ -71,15 +71,15 @@ tc_accept_report_t pus_service1_tc_acceptation(tc_handler_t *ptc_handler) {
 		    uint8_t subtype=ptc_handler->tc_df_header.subtype;
 			switch (type) {
 			//TODO 03 Add TC[17,1] acceptation
-			//case (  ):
-				//switch (  ) {
-				//case (  ):
-					//break;
-				//default:
-					//accept_report.accept_status = TCAcceptationSubTypeError;
+			case (17):
+				switch (subtype) {
+				case (1):
+					break;
+				default:
+					accept_report.accept_status = TCAcceptationSubTypeError;
 
-				//}
-				//break;
+				}
+				break;
 
 			default:
 				//TC is not accepted
