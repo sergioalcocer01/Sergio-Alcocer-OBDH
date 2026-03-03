@@ -40,9 +40,9 @@ void pus_service17_exec_tc(
 	switch (ptc_handler->tc_df_header.subtype) {
 
 	//TODO 08 execute pus_service17_exec_TC_17_1
-		//case (  ):
-				//pus_serviceXX_exec_TC_XX_XX(ptc_handler);
-		//break;
+		case (17):
+				pus_serviceXX_exec_TC_17_1(ptc_handler);
+		break;
 	default:
 		//No defined code for this TC. ASW design error
 		pus_service1_tx_TM_1_4_TC_X_Y_NO_EXEC_CODE(ptc_handler);
@@ -56,13 +56,13 @@ void pus_service17_exec_TC_17_1(tc_handler_t *ptc_handler){
 
 
 	//TODO 09 Tx TM[1,3]
-	//pus_service1_tx_TM_1_3(ptc_handler);
+	pus_service1_tx_TM_1_3(ptc_handler);
 
 	//TODO 10 Tx TM[17,1]
-	//pus_service17_tx_TM_17_2(ptc_handler);
+	pus_service17_tx_TM_17_2(ptc_handler);
 
 	//TODO 11 Tx TM[1,7]
-	//pus_service1_tx_TM_1_7(ptc_handler);
+	pus_service1_tx_TM_1_7(ptc_handler);
 
 
 	//free memory
