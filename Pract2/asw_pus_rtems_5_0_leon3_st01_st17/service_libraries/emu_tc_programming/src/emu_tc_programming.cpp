@@ -51,7 +51,7 @@ EmuGSS_TCProgram17_1 prog_FT_0010_step_0(FT_UAH_ASW_0010_TIME_step0,
 
 
 //TODO 12 Program TC[17,1] at POWER_ON + 8
-#define FT_UAH_ASW_0020_TIME_step0 (OBT_AFTER_POWER_ON + ??)
+#define FT_UAH_ASW_0020_TIME_step0 (OBT_AFTER_POWER_ON + 8)
 
 EmuGSS_TCProgram17_1_DISABLE_1_7 prog_FT_0020_step_0(FT_UAH_ASW_0020_TIME_step0,
 					"FT_UAH_ASW_SERV_1_DISABLE_1_7_0020 step 0, Disable TM[1,7]");
@@ -62,7 +62,7 @@ EmuGSS_TCProgram17_1_DISABLE_1_7 prog_FT_0020_step_0(FT_UAH_ASW_0020_TIME_step0,
 #ifdef FT_UAH_ASW_SERV_1_REJ_TC_0030
 
 //TODO 13 Program TC[17,1] at POWER_ON + 10
-#define FT_UAH_ASW_0030_TIME_step0 (OBT_AFTER_POWER_ON + ??)
+#define FT_UAH_ASW_0030_TIME_step0 (OBT_AFTER_POWER_ON + 10)
 
 EmuGSS_TCProgram17_3 prog_FT_0030_step_0(FT_UAH_ASW_0030_TIME_step0,
 		"FT_UAH_ASW_SERV_1_0030 step 0, Rejected TC",0xFF);
@@ -73,7 +73,7 @@ EmuGSS_TCProgram17_3 prog_FT_0030_step_0(FT_UAH_ASW_0030_TIME_step0,
 
 //TODO 14 Program TC[17,1] at POWER_ON + 12
 
-#define FT_UAH_ASW_0040_TIME_step0 (OBT_AFTER_POWER_ON + ??)
+#define FT_UAH_ASW_0040_TIME_step0 (OBT_AFTER_POWER_ON + 12)
 
 EmuGSS_TCProgram17_1 prog_FT_0100_step_0(FT_UAH_ASW_0040_TIME_step0,
 					"FT_SOLO_EPD_TCContainment_0100 step 0");
