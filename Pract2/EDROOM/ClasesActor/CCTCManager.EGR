@@ -250,7 +250,7 @@ I
 OSubEstI
 Ready
 DSubEst
-;
+FInit();
 [Trigger]
 EDROOMsl
 EDROOMStart
@@ -275,8 +275,8 @@ NewRxTC
 DPEleccion
 ;
 [Trigger]
-*
- 
+RxTC
+EDROOMIRQsignal
 true
  
  
