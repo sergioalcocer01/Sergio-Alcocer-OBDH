@@ -118,7 +118,7 @@ Ready
 179 146 143 315
 [FinObjetoGrafico]
 Reboot
-;
+FReboot();
 ;
 ;
 ;
@@ -211,7 +211,7 @@ ToReboot
 GToReboot()
 Reboot
 DSubEst
-;
+FExecRebootTC();
 
  
 
@@ -228,7 +228,7 @@ ExecPrioTC
 true
 Ready
 DSubEst
-;
+FExecPrioTC();
 
  
 
