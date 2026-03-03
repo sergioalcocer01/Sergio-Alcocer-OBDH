@@ -296,6 +296,11 @@ public:
 		/**
 		 * \brief  
 		 */
+		void	FExecRebootTC();
+
+		/**
+		 * \brief  
+		 */
 		void	FGetTC();
 
 		/**
@@ -332,11 +337,6 @@ public:
 		 * \brief  
 		 */
 		bool	GToReboot();
-
-		/**
-		 * \brief 
-		 */
-		void	FExecRebootTC();
 
 	};
 

@@ -77,6 +77,16 @@ VCurrentTC.ExecPrioTC();
 
 
 
+void	CCTCManager::EDROOM_CTX_Top_0::FExecRebootTC()
+
+{
+
+VCurrentTC.ExecRebootTC();
+
+}
+
+
+
 void	CCTCManager::EDROOM_CTX_Top_0::FGetTC()
 
 {
@@ -169,16 +179,6 @@ bool	CCTCManager::EDROOM_CTX_Top_0::GToReboot()
 {
 
 return VTCExecCtrl.IsRebootTC();
-
-}
-
-
-
-void	CCTCManager::EDROOM_CTX_Top_0::FExecRebootTC()
-
-{
-
-VCurrentTC.ExecRebootTC();
 
 }
 
@@ -292,8 +292,6 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				//Evaluate Branch ToReboot
 				if( GToReboot() )
 				{
-					//Execute Action 
-					FExecRebootTC();
 
 					//Branch taken is HandleTC_ToReboot
 					edroomCurrentTrans.localId =
@@ -305,8 +303,6 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				//Default Branch ExecPrioTC
 				else
 				{
-					//Execute Action 
-					FExecPrioTC();
 
 					//Branch taken is HandleTC_ExecPrioTC
 					edroomCurrentTrans.localId =
@@ -336,8 +332,6 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 
 				//Go to the state Reboot
 			case (Reboot):
-				//Execute Entry Action 
-				FReboot();
 				//Arrival to state Reboot
 				edroomCurrentTrans=EDROOMRebootArrival();
 				break;

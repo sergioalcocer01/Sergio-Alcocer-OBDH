@@ -29,7 +29,7 @@ class CDTCExecCtrl{
 	 * \return true if it is a priority telecommand
 	 *
 	 */
-
+	//TODO 
 	bool IsPrioTC(){return (ExecCtrlPrioTC==mExecCtrl);}
 
 	/**

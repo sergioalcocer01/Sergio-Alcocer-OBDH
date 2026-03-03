@@ -5,8 +5,8 @@
 0
 0
 [Modificado]
-1
-1
+0
+0
 0
 [Estructura]
 [Version Estructura]
@@ -168,13 +168,13 @@ NewRxTC
 [Version Ramas]
 5
 Accepted
-true
+GAcceptTC()
 ValidTC
 DSubEst
 FMngTCAcceptation();
+
  
- 
- 
+
 ;
 ;
 ;
@@ -212,9 +212,9 @@ GToReboot()
 Reboot
 DSubEst
 ;
+
  
- 
- 
+
 ;
 ;
 ;
@@ -229,9 +229,9 @@ true
 Ready
 DSubEst
 ;
+
  
- 
- 
+
 ;
 ;
 ;
