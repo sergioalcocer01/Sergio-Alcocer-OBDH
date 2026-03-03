@@ -41,7 +41,7 @@ void pus_service17_exec_tc(
 
 	//TODO 08 execute pus_service17_exec_TC_17_1
 		case (17):
-				pus_serviceXX_exec_TC_17_1(ptc_handler);
+				pus_service17_exec_TC_17_1(ptc_handler);
 		break;
 	default:
 		//No defined code for this TC. ASW design error
