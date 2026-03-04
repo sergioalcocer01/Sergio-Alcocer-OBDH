@@ -40,7 +40,7 @@ void pus_service17_exec_tc(
 	switch (ptc_handler->tc_df_header.subtype) {
 
 	//TODO 08 execute pus_service17_exec_TC_17_1
-		case (17):
+		case (1):
 				pus_service17_exec_TC_17_1(ptc_handler);
 		break;
 	default:
