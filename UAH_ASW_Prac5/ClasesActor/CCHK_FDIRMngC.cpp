@@ -65,14 +65,14 @@ void	CCHK_FDIRMng::EDROOM_CTX_Top_0::FDoHK_FDIR()
 {
    //Define absolute time
   Pr_Time time;
-
+ 
  
 VNextTimeout+= Pr_Time(1,0); // Add X sec + Y microsec 
 time=VNextTimeout; 
  
 pus_services_update_params();
 pus_service3_do_HK();
-
+ 
 pus_services_do_FDIR();
    //Program absolute timer 
    HK_FDIRTimer.InformAt( time ); 
