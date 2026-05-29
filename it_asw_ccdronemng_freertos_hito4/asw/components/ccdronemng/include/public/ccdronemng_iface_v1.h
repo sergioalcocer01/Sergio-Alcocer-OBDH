@@ -38,8 +38,7 @@ public:
 							EDROOMSignalDestroy, 
 							SDroneSetUp, 
 							SDroneTC, 
-							SDroneReady, 
-							SFlightFinished };
+							SDroneReady };
 
 	/**
 	 * \class CCDroneMng::CEDROOMMemory
@@ -178,8 +177,7 @@ public:
 		EDROOMSignalDestroy,
 		SDroneSetUp,
 		SDroneTC,
-		SDroneReady,
-		SFlightFinished };
+		SDroneReady };
 
 
 		friend class CCDroneMng;
@@ -280,11 +278,6 @@ public:
 		 * \brief  
 		 */
 		void	FInitFlightPlan();
-
-		/**
-		 * \brief  
-		 */
-		void	FPlanDone();
 
 		/**
 		 * \brief  

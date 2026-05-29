@@ -347,17 +347,6 @@ pSDroneSetUp_Data->DefaultKd=0.05;
 
 
 
-bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
-
-{
-
-return (VCurrentTC.GetService() == 129 && VCurrentTC.GetSubtype() == 3);
- 
-
-}
-
-
-
 	//********************************** Pools *************************************
 
 	//CEDROOMPOOLCDTCHandler
@@ -588,12 +577,6 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				edroomCurrentTrans=EDROOMValidTCArrival();
 				break;
 
-				//Go to the state StandBy
-			case (StandBy):
-				//Arrival to state StandBy
-				edroomCurrentTrans=EDROOMStandByArrival();
-				break;
-
 		}
 
 		edroomCurrentState=edroomNextState;
@@ -669,40 +652,6 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMValidTCArrival()
 
 
 TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMRebootArrival()
-{
-
-	TEDROOMTransId edroomCurrentTrans;
-
-	bool edroomValidMsg=false;
-
-	do
-	{
-
-		EDROOMNewMessage ();
-
-		if (false == edroomValidMsg)
-		{
-			 edroomValidMsg = EDROOMSearchContextTrans(edroomCurrentTrans);
-
-		}
-
-	} while (false == edroomValidMsg);
-
-	return(edroomCurrentTrans);
-
-}
-
-
-
-	// ***********************************************************************
-
-	// Leaf SubState  StandBy
-
-	// ***********************************************************************
-
-
-
-TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMStandByArrival()
 {
 
 	TEDROOMTransId edroomCurrentTrans;
