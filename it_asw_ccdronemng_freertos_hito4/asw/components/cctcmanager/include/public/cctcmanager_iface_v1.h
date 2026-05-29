@@ -429,14 +429,21 @@ public:
 
 		//! State Identifiers
 		enum TEDROOMStateID{StandBy,
-			InFlight};
+			InFlight,
+			JoinPoint2,
+			JoinPoint3};
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
-			Transicion1,
-			Transicion2,
 			Transicion3,
 			Transicion4,
+			Transicion5,
+			Transicion6,
+			Transicion7,
+			Transicion8,
+			Transicion9,
+			Transicion10,
+			Transicion11,
 			EDROOMMemoryTrans };
 
 
@@ -505,6 +512,26 @@ public:
 		//! Context Init
 
 		void EDROOMInit();
+
+		// ***********************************************************************
+
+		// JoinPoint JoinPoint2
+
+		// ***********************************************************************
+
+
+
+		TEDROOMTransId EDROOMJoinPoint2Arrival();
+
+		// ***********************************************************************
+
+		// JoinPoint JoinPoint3
+
+		// ***********************************************************************
+
+
+
+		TEDROOMTransId EDROOMJoinPoint3Arrival();
 
 		// ***********************************************************************
 

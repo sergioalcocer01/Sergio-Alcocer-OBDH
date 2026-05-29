@@ -772,6 +772,18 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 				edroomCurrentTrans=EDROOMInFlightArrival();
 				break;
 
+				//Go to the join point JoinPoint2
+			case (JoinPoint2):
+				//Arrival to join point JoinPoint2
+				edroomCurrentTrans=EDROOMJoinPoint2Arrival();
+				break;
+
+				//Go to the join point JoinPoint3
+			case (JoinPoint3):
+				//Arrival to join point JoinPoint3
+				edroomCurrentTrans=EDROOMJoinPoint3Arrival();
+				break;
+
 		}
 
 		edroomCurrentState=edroomNextState;
@@ -782,15 +794,25 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 			switch (edroomCurrentTrans.localId)
 			{
 
-				case (Transicion1):
-					//Exit across the exit point NewRxTC
-					edroomCurrentTrans.localId= 
-						EDROOM_CTX_Top_0::NewRxTC;
-					edroomCurrentTrans.distanceToContext= 1;
-					edroomContextExit=1;
+				case (Transicion4):
+					//Go to the state StandBy
+					edroomNextState = StandBy;
+					edroomContextExit=0;
 					break;
 
-				case (Transicion2):
+				case (Transicion5):
+					//Go to the join point JoinPoint3
+					edroomNextState = JoinPoint3;
+					edroomContextExit=0;
+					break;
+
+				case (Transicion6):
+					//Go to the join point JoinPoint3
+					edroomNextState = JoinPoint3;
+					edroomContextExit=0;
+					break;
+
+				case (Transicion7):
 					//Exit across the exit point NewEvAction
 					edroomCurrentTrans.localId= 
 						EDROOM_CTX_Top_0::NewEvAction;
@@ -798,9 +820,29 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 					edroomContextExit=1;
 					break;
 
-				case (Transicion4):
-					//Go to the state StandBy
-					edroomNextState = StandBy;
+				case (Transicion8):
+					//Go to the join point JoinPoint2
+					edroomNextState = JoinPoint2;
+					edroomContextExit=0;
+					break;
+
+				case (Transicion9):
+					//Go to the join point JoinPoint2
+					edroomNextState = JoinPoint2;
+					edroomContextExit=0;
+					break;
+
+				case (Transicion10):
+					//Exit across the exit point NewRxTC
+					edroomCurrentTrans.localId= 
+						EDROOM_CTX_Top_0::NewRxTC;
+					edroomCurrentTrans.distanceToContext= 1;
+					edroomContextExit=1;
+					break;
+
+				case (Transicion11):
+					//Go to the state InFlight
+					edroomNextState = InFlight;
 					edroomContextExit=0;
 					break;
 
@@ -830,6 +872,50 @@ void CCTCManager::EDROOM_SUB_Ready_1::EDROOMInit()
 
 
 
+//	 ***********************************************************************
+
+//	 JoinPoint JoinPoint2
+
+//	 ***********************************************************************
+
+
+
+TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMJoinPoint2Arrival()
+{
+
+	TEDROOMTransId edroomCurrentTrans;
+
+	//Next transition is  Transicion10
+	edroomCurrentTrans.localId = Transicion10;
+	edroomCurrentTrans.distanceToContext = 0;
+	return(edroomCurrentTrans);
+
+}
+
+
+
+//	 ***********************************************************************
+
+//	 JoinPoint JoinPoint3
+
+//	 ***********************************************************************
+
+
+
+TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMJoinPoint3Arrival()
+{
+
+	TEDROOMTransId edroomCurrentTrans;
+
+	//Next transition is  Transicion7
+	edroomCurrentTrans.localId = Transicion7;
+	edroomCurrentTrans.distanceToContext = 0;
+	return(edroomCurrentTrans);
+
+}
+
+
+
 	// ***********************************************************************
 
 	// Leaf SubState  StandBy
@@ -853,26 +939,26 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMStandByArrival()
 		switch(Msg->signal)
 		{
 
-			case (EDROOMIRQsignal): 
+			case (SEvAction): 
 
-				 if (*Msg->GetPInterface() == RxTC)
+				 if (*Msg->GetPInterface() == HK_FDIRCtrl)
 				{
 
-					//Next transition is  Transicion1
-					edroomCurrentTrans.localId= Transicion1;
+					//Next transition is  Transicion5
+					edroomCurrentTrans.localId= Transicion5;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
 
 				break;
 
-			case (SEvAction): 
+			case (EDROOMIRQsignal): 
 
-				 if (*Msg->GetPInterface() == HK_FDIRCtrl)
+				 if (*Msg->GetPInterface() == RxTC)
 				{
 
-					//Next transition is  Transicion2
-					edroomCurrentTrans.localId= Transicion2;
+					//Next transition is  Transicion9
+					edroomCurrentTrans.localId= Transicion9;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
@@ -925,6 +1011,42 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMInFlightArrival()
 
 					//Next transition is  Transicion4
 					edroomCurrentTrans.localId= Transicion4;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				break;
+
+			case (SEvAction): 
+
+				 if (*Msg->GetPInterface() == HK_FDIRCtrl)
+				{
+
+					//Next transition is  Transicion6
+					edroomCurrentTrans.localId= Transicion6;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				break;
+
+			case (EDROOMIRQsignal): 
+
+				 if (*Msg->GetPInterface() == RxTC
+					&& GFwdDroneTC())
+				{
+
+					//Next transition is  Transicion8
+					edroomCurrentTrans.localId= Transicion8;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				 else if (*Msg->GetPInterface() == RxTC)
+				{
+
+					//Next transition is  Transicion11
+					edroomCurrentTrans.localId= Transicion11;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
