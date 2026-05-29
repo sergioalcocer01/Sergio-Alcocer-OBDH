@@ -54,10 +54,14 @@ public:
 	//!Exec the reboot telecommands
 	void ExecBKGTC();
 
+	//!Exec the reboot telecommands
+	void ExecDroneTC();
+
 	//!Mng TC Rejection during flight
-	void MngTCRejectionInFlight(CDTCAcceptReport & acceptReport) {
-    		pus_service1_tx_TM_1_X_no_failure_data(&mTCHandler, TCVerifStageAcceptation, 0);
-    		tc_handler_free_memory(&mTCHandler);
+	void MngTCRejectionInFlight(CDTCAcceptReport & acceptReport){
+		acceptReport.mAcceptReport.accept_status=TCAcceptationTypeError; //Error de tipo
+		pus_service1_tx_TM_1_2(&mTCHandler, acceptReport.mAcceptReport);
+		tc_handler_free_memory(&mTCHandler);
 	}
 
 };

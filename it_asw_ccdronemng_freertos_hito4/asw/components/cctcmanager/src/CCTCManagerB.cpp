@@ -385,7 +385,11 @@ void	CCTCManager::EDROOM_CTX_Ready_1::FRejectTCFlight()
 {
    //Handle Msg->data
   CDTCMemDescriptor & varEDROOMIRQsignal = *(CDTCMemDescriptor *)Msg->data;
-//
+// Preparamos el reporte de aceptación (necesario para el método del profesor)
+CDTCAcceptReport acceptReport;
+
+// Llamamos al método que rechaza el TC durante el vuelo
+varSDroneTC.MngTCRejectionInFlight(acceptReport);
 
 }
 
@@ -395,10 +399,7 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 
 {
 
- 
-pusSt01Descriptor_t tc_desc = VCurrentTC.GetDescriptor();
-	
-return (pus_get_service(tc_desc) == 129 && pus_get_subtype(tc_desc) == 3);
+return pus_service129_flight_plan_ready();
 
 }
 
