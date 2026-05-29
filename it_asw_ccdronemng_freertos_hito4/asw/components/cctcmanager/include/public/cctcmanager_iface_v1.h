@@ -44,7 +44,7 @@ public:
 							SDroneSetUp, 
 							SDroneTC, 
 							SDroneReady, 
-							SFlightDone, 
+							SFlightFinished, 
 							SBKGTC, 
 							EDROOMIRQsignal, 
 							SHK_FDIR_TC, 
@@ -223,7 +223,7 @@ public:
 		SDroneSetUp,
 		SDroneTC,
 		SDroneReady,
-		SFlightDone,
+		SFlightFinished,
 		SBKGTC,
 		EDROOMIRQsignal,
 		SHK_FDIR_TC,
@@ -429,21 +429,13 @@ public:
 
 		//! State Identifiers
 		enum TEDROOMStateID{StandBy,
-			InFlight,
-			JoinPoint2,
-			JoinPoint3};
+			SubEstado1};
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
+			Transicion1,
 			Transicion3,
 			Transicion4,
-			Transicion5,
-			Transicion6,
-			Transicion7,
-			Transicion8,
-			Transicion9,
-			Transicion10,
-			Transicion11,
 			EDROOMMemoryTrans };
 
 
@@ -515,26 +507,6 @@ public:
 
 		// ***********************************************************************
 
-		// JoinPoint JoinPoint2
-
-		// ***********************************************************************
-
-
-
-		TEDROOMTransId EDROOMJoinPoint2Arrival();
-
-		// ***********************************************************************
-
-		// JoinPoint JoinPoint3
-
-		// ***********************************************************************
-
-
-
-		TEDROOMTransId EDROOMJoinPoint3Arrival();
-
-		// ***********************************************************************
-
 		// Leaf SubState StandBy
 
 		// ***********************************************************************
@@ -545,13 +517,13 @@ public:
 
 		// ***********************************************************************
 
-		// Leaf SubState InFlight
+		// Leaf SubState SubEstado1
 
 		// ***********************************************************************
 
 
 
-		TEDROOMTransId EDROOMInFlightArrival();
+		TEDROOMTransId EDROOMSubEstado1Arrival();
 
 	};
 

@@ -39,7 +39,7 @@ public:
 							SDroneSetUp, 
 							SDroneTC, 
 							SDroneReady, 
-							SFlightDone };
+							SFlightFinished };
 
 	/**
 	 * \class CCDroneMng::CEDROOMMemory
@@ -179,7 +179,7 @@ public:
 		SDroneSetUp,
 		SDroneTC,
 		SDroneReady,
-		SFlightDone };
+		SFlightFinished };
 
 
 		friend class CCDroneMng;
@@ -309,7 +309,7 @@ public:
 		/**
 		 * \brief 
 		 */
-		void	FFlightDone();
+		void	FFlightFinished();
 
 	};
 
