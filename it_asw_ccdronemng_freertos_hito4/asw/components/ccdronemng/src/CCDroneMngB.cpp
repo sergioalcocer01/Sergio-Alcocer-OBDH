@@ -184,6 +184,16 @@ return pus_service129_flight_plan_done();
 
 
 
+void	CCDroneMng::EDROOM_CTX_Top_0::FFlightDone()
+
+{
+
+   //Send message 
+   DroneMngCtrl.send(SFlightDone); 
+}
+
+
+
 	//********************************** Pools *************************************
 
 
@@ -278,6 +288,8 @@ void CCDroneMng::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				{
 					//Execute Action 
 					FToReady();
+					//Send Asynchronous Message 
+					FFlightDone();
 
 					//Branch taken is CtrlAlgorithm_PlanDone
 					edroomCurrentTrans.localId =

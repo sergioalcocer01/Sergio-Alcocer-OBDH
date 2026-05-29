@@ -44,6 +44,7 @@ public:
 							SDroneSetUp, 
 							SDroneTC, 
 							SDroneReady, 
+							SFlightDone, 
 							SBKGTC, 
 							EDROOMIRQsignal, 
 							SHK_FDIR_TC, 
@@ -222,6 +223,7 @@ public:
 		SDroneSetUp,
 		SDroneTC,
 		SDroneReady,
+		SFlightDone,
 		SBKGTC,
 		EDROOMIRQsignal,
 		SHK_FDIR_TC,
@@ -426,12 +428,15 @@ public:
 	protected:
 
 		//! State Identifiers
-		enum TEDROOMStateID{StandBy};
+		enum TEDROOMStateID{StandBy,
+			InFlight};
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
 			Transicion1,
 			Transicion2,
+			Transicion3,
+			Transicion4,
 			EDROOMMemoryTrans };
 
 
@@ -510,6 +515,16 @@ public:
 
 
 		TEDROOMTransId EDROOMStandByArrival();
+
+		// ***********************************************************************
+
+		// Leaf SubState InFlight
+
+		// ***********************************************************************
+
+
+
+		TEDROOMTransId EDROOMInFlightArrival();
 
 	};
 

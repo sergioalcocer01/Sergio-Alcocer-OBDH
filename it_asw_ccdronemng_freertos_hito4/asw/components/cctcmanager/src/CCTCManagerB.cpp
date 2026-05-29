@@ -703,6 +703,8 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 
 	TEDROOMTransId edroomCurrentTrans;
 
+	int edroomContextExit=0;
+
 	//Transition at Context Entry
 	switch (arrivingTrans)
 	{
@@ -727,10 +729,10 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 			edroomCurrentTrans.localId = EDROOMMemoryTrans ;
 			edroomNextState = edroomCurrentState;
 			break;
+		//From entry point HandleTC_FwdDroneTC
 		case (EDROOM_CTX_Top_0::HandleTC_FwdDroneTC):
-			//Memory Entry 
-			edroomCurrentTrans.localId = EDROOMMemoryTrans ;
-			edroomNextState = edroomCurrentState;
+			edroomCurrentTrans.localId= Transicion3;
+			edroomNextState = InFlight;
 			break;
 		//From entry point Init
 		case (EDROOM_CTX_Top_0::Init):
@@ -751,6 +753,9 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 			break;
 	}
 
+	do
+	{
+
 		//Entry into the Next State 
 		switch(edroomNextState)
 		{
@@ -761,9 +766,52 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 				edroomCurrentTrans=EDROOMStandByArrival();
 				break;
 
+				//Go to the state InFlight
+			case (InFlight):
+				//Arrival to state InFlight
+				edroomCurrentTrans=EDROOMInFlightArrival();
+				break;
+
 		}
 
 		edroomCurrentState=edroomNextState;
+
+		if (edroomCurrentTrans.distanceToContext == 0)
+		{
+
+			switch (edroomCurrentTrans.localId)
+			{
+
+				case (Transicion1):
+					//Exit across the exit point NewRxTC
+					edroomCurrentTrans.localId= 
+						EDROOM_CTX_Top_0::NewRxTC;
+					edroomCurrentTrans.distanceToContext= 1;
+					edroomContextExit=1;
+					break;
+
+				case (Transicion2):
+					//Exit across the exit point NewEvAction
+					edroomCurrentTrans.localId= 
+						EDROOM_CTX_Top_0::NewEvAction;
+					edroomCurrentTrans.distanceToContext= 1;
+					edroomContextExit=1;
+					break;
+
+				case (Transicion4):
+					//Go to the state StandBy
+					edroomNextState = StandBy;
+					edroomContextExit=0;
+					break;
+
+			}
+
+		}else
+		{
+			edroomContextExit=1;
+		}
+
+	}while(0 == edroomContextExit);
 
 	edroomCurrentTrans.distanceToContext--;
 
@@ -825,6 +873,58 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMStandByArrival()
 
 					//Next transition is  Transicion2
 					edroomCurrentTrans.localId= Transicion2;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				break;
+
+		};
+
+		if (false == edroomValidMsg)
+		{
+			 edroomValidMsg = EDROOMSearchContextTrans(edroomCurrentTrans);
+
+		}
+
+	} while (false == edroomValidMsg);
+
+	return(edroomCurrentTrans);
+
+}
+
+
+
+	// ***********************************************************************
+
+	// Leaf SubState  InFlight
+
+	// ***********************************************************************
+
+
+
+TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMInFlightArrival()
+{
+
+	TEDROOMTransId edroomCurrentTrans;
+
+	bool edroomValidMsg=false;
+
+	do
+	{
+
+		EDROOMNewMessage ();
+
+		switch(Msg->signal)
+		{
+
+			case (SFlightDone): 
+
+				 if (*Msg->GetPInterface() == DroneMngCtrl)
+				{
+
+					//Next transition is  Transicion4
+					edroomCurrentTrans.localId= Transicion4;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
