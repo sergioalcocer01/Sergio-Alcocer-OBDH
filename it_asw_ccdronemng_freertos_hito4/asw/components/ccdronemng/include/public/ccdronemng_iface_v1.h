@@ -274,6 +274,11 @@ public:
 		/**
 		 * \brief  
 		 */
+		void	FFlightFinished();
+
+		/**
+		 * \brief  
+		 */
 		void	FGetConfig();
 
 		/**
@@ -305,11 +310,6 @@ public:
 		 * \brief  
 		 */
 		bool	GFlightPlanDone();
-
-		/**
-		 * \brief 
-		 */
-		void	FFlightFinished();
 
 	};
 

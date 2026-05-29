@@ -469,14 +469,14 @@ public:
 		void	FInvokeDroneSetUp();
 
 		/**
-		 * \brief 
-		 */
-		bool	GStartFlight();
-
-		/**
-		 * \brief 
+		 * \brief  
 		 */
 		void	FRejectTCFlight();
+
+		/**
+		 * \brief  
+		 */
+		bool	GStartFlight();
 
 	};
 

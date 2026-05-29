@@ -55,7 +55,6 @@ public:
 	void ExecBKGTC();
 
 	//!Mng TC Rejection during flight
-	//!Mng TC Rejection during flight
 	void MngTCRejectionInFlight(CDTCAcceptReport & acceptReport) {
     		pus_service1_tx_TM_1_X_no_failure_data(&mTCHandler, TCVerifStageAcceptation, 0);
     		tc_handler_free_memory(&mTCHandler);

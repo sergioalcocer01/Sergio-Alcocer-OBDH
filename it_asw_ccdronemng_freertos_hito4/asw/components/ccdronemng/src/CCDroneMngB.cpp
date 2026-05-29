@@ -96,6 +96,16 @@ pus_service129_flight_ctrl_algorithm();
 
 
 
+void	CCDroneMng::EDROOM_CTX_Top_0::FFlightFinished()
+
+{
+
+   //Send message 
+   DroneMngCtrl.send(SFlightFinished); 
+}
+
+
+
 void	CCDroneMng::EDROOM_CTX_Top_0::FGetConfig()
 
 {
@@ -180,16 +190,6 @@ bool	CCDroneMng::EDROOM_CTX_Top_0::GFlightPlanDone()
 
 return pus_service129_flight_plan_done();
 
-}
-
-
-
-void	CCDroneMng::EDROOM_CTX_Top_0::FFlightFinished()
-
-{
-
-   //Send message 
-   DroneMngCtrl.send(SFlightFinished); 
 }
 
 
