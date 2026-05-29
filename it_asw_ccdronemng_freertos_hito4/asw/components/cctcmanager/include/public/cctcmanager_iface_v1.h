@@ -429,19 +429,12 @@ public:
 	protected:
 
 		//! State Identifiers
-		enum TEDROOMStateID{StandBy,
-			InFlight,
-			EvAction};
+		enum TEDROOMStateID{StandBy};
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
-			PlaneDone,
-			Bucle,
-			Transicion3,
-			Flight,
-			EvActionFromStanBy,
-			Transicion6,
-			EvActionFromFlight,
+			Transicion1,
+			Transicion2,
 			EDROOMMemoryTrans };
 
 
@@ -475,7 +468,7 @@ public:
 		void	FInvokeDroneSetUp();
 
 		/**
-		 * \brief 
+		 * \brief  
 		 */
 		bool	GStartFlight();
 
@@ -518,16 +511,6 @@ public:
 
 		// ***********************************************************************
 
-		// JoinPoint EvAction
-
-		// ***********************************************************************
-
-
-
-		TEDROOMTransId EDROOMEvActionArrival();
-
-		// ***********************************************************************
-
 		// Leaf SubState StandBy
 
 		// ***********************************************************************
@@ -535,16 +518,6 @@ public:
 
 
 		TEDROOMTransId EDROOMStandByArrival();
-
-		// ***********************************************************************
-
-		// Leaf SubState InFlight
-
-		// ***********************************************************************
-
-
-
-		TEDROOMTransId EDROOMInFlightArrival();
 
 	};
 
