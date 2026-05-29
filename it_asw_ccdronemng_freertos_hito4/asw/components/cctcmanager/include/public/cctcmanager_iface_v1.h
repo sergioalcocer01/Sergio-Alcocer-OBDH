@@ -435,7 +435,7 @@ public:
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
 			StartFlight,
 			FlightDone,
-			Transicion3,
+			FlightCompleted,
 			EDROOMMemoryTrans };
 
 

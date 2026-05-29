@@ -384,7 +384,10 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 
 {
 
-return (VCurrentTC.GetService() == 129 && VCurrentTC.GetSubtype() == 3);
+
+pusSt01Descriptor_t tc_desc = VCurrentTC.GetDescriptor();
+	
+return (pus_get_service(tc_desc) == 129 && pus_get_subtype(tc_desc) == 3);
 
 }
 
@@ -841,9 +844,7 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 					edroomContextExit=0;
 					break;
 
-				case (Transicion3):
-				//Msg->Data Handling 
-				FGetEvAction();
+				case (FlightCompleted):
 					//Go to the state inFlight
 					edroomNextState = inFlight;
 					edroomContextExit=0;
@@ -951,23 +952,14 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMinFlightArrival()
 		switch(Msg->signal)
 		{
 
-			case (EDROOMIRQsignal): 
-
-				 if (*Msg->GetPInterface() == RxTC
-					&& GFwdDroneTC())
-				{
-
-					//Next transition is  Transicion3
-					edroomCurrentTrans.localId= Transicion3;
-					edroomCurrentTrans.distanceToContext = 0;
-					edroomValidMsg=true;
-				 }
-
-				break;
-
 			case (SFlightFinished): 
 
-				 {
+				 if ( GFwdDroneTC()) {
+					//Next transition is  FlightDone
+					edroomCurrentTrans.localId= FlightCompleted;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				else {
 					//Next transition is  FlightDone
 					edroomCurrentTrans.localId= FlightDone;
 					edroomCurrentTrans.distanceToContext = 0;
