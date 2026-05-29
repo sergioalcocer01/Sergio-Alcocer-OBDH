@@ -393,6 +393,37 @@ return (pus_get_service(tc_desc) == 129 && pus_get_subtype(tc_desc) == 3);
 
 
 
+void	CCTCManager::EDROOM_CTX_Ready_1::FRejectTCFlight()
+
+{
+   //Handle Msg->data
+  CDTCMemDescriptor & varEDROOMIRQsignal = *(CDTCMemDescriptor *)Msg->data;
+VCurrentTC.BuildFromDescriptor(varEDROOMIRQsignal);
+
+pusSt01Descriptor_t tc_desc = VCurrentTC.GetDescriptor();
+
+uint8_t service = pus_get_service(tc_desc);
+uint8_t subtype = pus_get_subtype(tc_desc);
+
+if (service == 129 && subtype == 4) {
+    // Caso de aborto (129,4): aceptación de éxito y reenvío nominal
+    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageAcceptation, 0); 
+    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageStart, 0);       
+    
+    FFwdDroneTC(); // Lo enviamos asíncronamente al dron
+    
+    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageCompletion, 0);  
+} else {
+    // Caso de rechazo: Invocamos tu nuevo método de CDTCHandler
+    CDTCAcceptReport acceptReport;
+    VCurrentTC.MngTCRejectionInFlight(acceptReport);
+}
+
+
+}
+
+
+
 	//********************************** Pools *************************************
 
 	//CEDROOMPOOLCDTCHandler
@@ -814,8 +845,6 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 
 				//Go to the state inFlight
 			case (inFlight):
-				//Send Asynchronous Message at Entry
-				FFwdDroneTC();
 				//Arrival to state inFlight
 				edroomCurrentTrans=EDROOMinFlightArrival();
 				break;
@@ -845,6 +874,8 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 					break;
 
 				case (FlightCompleted):
+				//Msg->Data Handling 
+				FRejectTCFlight();
 					//Go to the state inFlight
 					edroomNextState = inFlight;
 					edroomContextExit=0;
@@ -954,14 +985,24 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMinFlightArrival()
 
 			case (SFlightFinished): 
 
-				 if ( GFwdDroneTC()) {
-					//Next transition is  FlightDone
-					edroomCurrentTrans.localId= FlightCompleted;
-					edroomCurrentTrans.distanceToContext = 0;
-					edroomValidMsg=true;
-				else {
+				 if (*Msg->GetPInterface() == DroneMngCtrl)
+				{
+
 					//Next transition is  FlightDone
 					edroomCurrentTrans.localId= FlightDone;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				break;
+
+			case (EDROOMIRQsignal): 
+
+				 if (*Msg->GetPInterface() == RxTC)
+				{
+
+					//Next transition is  FlightCompleted
+					edroomCurrentTrans.localId= FlightCompleted;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }

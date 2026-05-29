@@ -6,6 +6,9 @@
 #include "public/ccsds_pus.h"
 #include "public/tmtc_dyn_mem.h"
 #include "public/pus_tc_handler.h"
+#include "public/pus_service01.h"
+
+#include "public/tc_handler.h"
 
 #include "public/cdtcmemdescriptor_iface_v1.h"
 #include "public/cdtcacceptreport_iface_v1.h"
@@ -53,9 +56,13 @@ public:
 	//!Exec the reboot telecommands
 	void ExecBKGTC();
 
-	void ExecDroneTC();
+	//!Mng TC Rejection during flight
+	//!Mng TC Rejection during flight
+	void MngTCRejectionInFlight(CDTCAcceptReport & acceptReport) {
+    		pus_service1_tx_TM_1_X_no_failure_data(&mTCHandler, TCVerifStageAcceptation, 0);
+    		tc_handler_free_memory(&mTCHandler);
+	}
 
 };
-
 
 #endif
