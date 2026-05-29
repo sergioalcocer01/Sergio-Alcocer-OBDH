@@ -466,12 +466,12 @@ public:
 		/**
 		 * \brief  
 		 */
-		void	FInvokeDroneSetUp();
+		void	FInFlightPlan();
 
 		/**
 		 * \brief  
 		 */
-		void	FRejectTCFlight();
+		void	FInvokeDroneSetUp();
 
 		/**
 		 * \brief  

@@ -363,6 +363,20 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 
 	// User-defined Functions   ****************************
 
+void	CCTCManager::EDROOM_CTX_Ready_1::FInFlightPlan()
+
+{
+
+CDTCHandler & varEDROOMIRQsignal = *(CDTCHandler *)Msg->data;
+ 
+CDTCAcceptReport acceptReport;
+ 
+varEDROOMIRQsignal.MngTCRejectionInFlight(acceptReport);
+
+}
+
+
+
 void	CCTCManager::EDROOM_CTX_Ready_1::FInvokeDroneSetUp()
 
 {
@@ -376,21 +390,6 @@ pSDroneSetUp_Data->DefaultKd=0.05;
    //Invoke synchronous communication 
    MsgBack=DroneMngCtrl.invoke(SDroneSetUp,pSDroneSetUp_Data,
                                                      &EDROOMPoolCDDroneConfig); 
-}
-
-
-
-void	CCTCManager::EDROOM_CTX_Ready_1::FRejectTCFlight()
-
-{
-   //Handle Msg->data
-  CDTCMemDescriptor & varEDROOMIRQsignal = *(CDTCMemDescriptor *)Msg->data;
-// Preparamos el reporte de aceptación (necesario para el método del profesor)
-CDTCAcceptReport acceptReport;
-
-// Llamamos al método que rechaza el TC durante el vuelo
-varSDroneTC.MngTCRejectionInFlight(acceptReport);
-
 }
 
 
@@ -855,8 +854,8 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 					break;
 
 				case (FlightCompleted):
-				//Msg->Data Handling 
-				FRejectTCFlight();
+				//Execute Action 
+				FInFlightPlan();
 					//Go to the state inFlight
 					edroomNextState = inFlight;
 					edroomContextExit=0;
