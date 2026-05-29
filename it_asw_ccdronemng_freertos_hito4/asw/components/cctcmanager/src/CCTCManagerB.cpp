@@ -398,27 +398,29 @@ void	CCTCManager::EDROOM_CTX_Ready_1::FRejectTCFlight()
 {
    //Handle Msg->data
   CDTCMemDescriptor & varEDROOMIRQsignal = *(CDTCMemDescriptor *)Msg->data;
+// 1. Vinculamos físicamente el descriptor con nuestra variable VCurrentTC
 VCurrentTC.BuildFromDescriptor(varEDROOMIRQsignal);
 
 pusSt01Descriptor_t tc_desc = VCurrentTC.GetDescriptor();
-
 uint8_t service = pus_get_service(tc_desc);
 uint8_t subtype = pus_get_subtype(tc_desc);
 
+// 2. FILTRADO INTERNO EN VUELO
 if (service == 129 && subtype == 4) {
-    // Caso de aborto (129,4): aceptación de éxito y reenvío nominal
-    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageAcceptation, 0); 
-    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageStart, 0);       
+    // --- CASO NOMINAL: ABORTO DE VUELO (TC[129,4]) ---
+    // Aceptamos el comando nominalmente y lo reenviamos al dron
+    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageAcceptation, 0); // TM[1,1]
+    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageStart, 0);       // TM[1,3]
     
-    FFwdDroneTC(); // Lo enviamos asíncronamente al dron
+    FFwdDroneTC(); // Enrutamos asíncronamente al dron
     
-    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageCompletion, 0);  
+    pus_service1_tx_TM_1_X_no_failure_data(tc_desc, TCVerifStageCompletion, 0);  // TM[1,7]
 } else {
-    // Caso de rechazo: Invocamos tu nuevo método de CDTCHandler
+    // --- CASO DE RECHAZO: CUALQUIER OTRO COMANDO EN VUELO ---
+    // Ejecutamos tu nuevo método de CDTCHandler (emite TM[1,2] y libera memoria)
     CDTCAcceptReport acceptReport;
     VCurrentTC.MngTCRejectionInFlight(acceptReport);
 }
-
 
 }
 
