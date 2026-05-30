@@ -803,9 +803,11 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMFlightArrival()
 
 				break;
 
-			case (SEvAction): 
+			case (EDROOMIRQsignal): 
 
-				 {
+				 if (*Msg->GetPInterface() == RxTC)
+				{
+
 					//Next transition is  InFlight
 					edroomCurrentTrans.localId= InFlight;
 					edroomCurrentTrans.distanceToContext = 0;
