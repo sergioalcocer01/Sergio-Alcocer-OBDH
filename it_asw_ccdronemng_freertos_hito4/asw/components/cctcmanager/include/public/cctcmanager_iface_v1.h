@@ -413,11 +413,6 @@ public:
 		 */
 		bool	GToReboot();
 
-		/**
-		 * \brief 
-		 */
-		bool	GNoFlight();
-
 	};
 
 	// ***********************************************************************
@@ -438,9 +433,9 @@ public:
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
-			StartFlight,
 			FlightDone,
-			FlightCompleted,
+			Flight,
+			StartFlight,
 			EDROOMMemoryTrans };
 
 

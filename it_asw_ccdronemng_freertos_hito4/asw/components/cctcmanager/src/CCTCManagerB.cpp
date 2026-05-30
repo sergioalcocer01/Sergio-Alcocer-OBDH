@@ -281,16 +281,6 @@ return VTCExecCtrl.IsRebootTC();
 
 
 
-bool	CCTCManager::EDROOM_CTX_Top_0::GNoFlight()
-
-{
-
-return !pus_service129_flight_plan_ready();
-
-}
-
-
-
 // ***********************************************************************
 
 // class EDROOM_CTX_Ready_1
@@ -329,8 +319,7 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 
 		 case (EDROOMIRQsignal): 
 
-				if (*Msg->GetPInterface() == RxTC
-					&& GNoFlight())
+				if (*Msg->GetPInterface() == RxTC)
 				{
 
 					 edroomValidMsg=true;
@@ -409,7 +398,7 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 
 {
 
-return pus_service129_flight_plan_ready();
+return !pus_service129_flight_plan_done();
 
 }
 
@@ -850,23 +839,21 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 			switch (edroomCurrentTrans.localId)
 			{
 
-				case (StartFlight):
-				//Send Asynchronous Message 
-				FFwdDroneTC();
-					//Go to the state inFlight
-					edroomNextState = inFlight;
-					edroomContextExit=0;
-					break;
-
 				case (FlightDone):
 					//Go to the state StandBy
 					edroomNextState = StandBy;
 					edroomContextExit=0;
 					break;
 
-				case (FlightCompleted):
+				case (Flight):
 				//Execute Action 
 				FInFlightPlan();
+					//Go to the state inFlight
+					edroomNextState = inFlight;
+					edroomContextExit=0;
+					break;
+
+				case (StartFlight):
 					//Go to the state inFlight
 					edroomNextState = inFlight;
 					edroomContextExit=0;
@@ -992,8 +979,8 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMinFlightArrival()
 				 if (*Msg->GetPInterface() == RxTC)
 				{
 
-					//Next transition is  FlightCompleted
-					edroomCurrentTrans.localId= FlightCompleted;
+					//Next transition is  Flight
+					edroomCurrentTrans.localId= Flight;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
