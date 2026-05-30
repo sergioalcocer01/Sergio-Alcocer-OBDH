@@ -539,6 +539,8 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				break;
 			//Next Transition is Fly
 			case (Fly):
+				//Execute Action 
+				FInFlightPlan();
 				//Next State is Flight
 				edroomNextState = Flight;
 				break;
@@ -787,9 +789,9 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMFlightArrival()
 		switch(Msg->signal)
 		{
 
-			case (EDROOMIRQsignal): 
+			case (SFlightFinished): 
 
-				 if (*Msg->GetPInterface() == RxTC
+				 if (*Msg->GetPInterface() == DroneMngCtrl
 					&& GFlightDone())
 				{
 
@@ -799,9 +801,11 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMFlightArrival()
 					edroomValidMsg=true;
 				 }
 
-				 else if (*Msg->GetPInterface() == RxTC)
-				{
+				break;
 
+			case (SEvAction): 
+
+				 {
 					//Next transition is  InFlight
 					edroomCurrentTrans.localId= InFlight;
 					edroomCurrentTrans.distanceToContext = 0;
