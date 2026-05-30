@@ -398,7 +398,7 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 
 {
 
-return pus_service129_flight_plan_ready();
+return pus_service129_init_flight_plan();
 
 }
 
@@ -913,7 +913,7 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMStandByArrival()
 			case (EDROOMIRQsignal): 
 
 				 if (*Msg->GetPInterface() == RxTC
-					&& GStartFlight())
+					&& GFwdDroneTC())
 				{
 
 					//Next transition is  StartFlight
