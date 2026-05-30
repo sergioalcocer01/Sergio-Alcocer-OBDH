@@ -850,6 +850,8 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 					break;
 
 				case (InFlight):
+				//Execute Action 
+				FInFlightPlan();
 					//Go to the state StandBy
 					edroomNextState = StandBy;
 					edroomContextExit=0;
