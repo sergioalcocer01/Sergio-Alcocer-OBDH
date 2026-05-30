@@ -409,7 +409,7 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 
 {
 
-return !pus_service129_flight_plan_ready();
+return pus_service129_flight_plan_ready();
 
 }
 
