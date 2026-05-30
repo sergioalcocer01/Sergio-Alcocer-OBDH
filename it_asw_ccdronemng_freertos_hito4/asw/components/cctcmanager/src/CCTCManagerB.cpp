@@ -281,6 +281,16 @@ return VTCExecCtrl.IsRebootTC();
 
 
 
+bool	CCTCManager::EDROOM_CTX_Top_0::GNoFlight()
+
+{
+
+return !pus_service129_flight_plan_ready();
+
+}
+
+
+
 // ***********************************************************************
 
 // class EDROOM_CTX_Ready_1
@@ -319,7 +329,8 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 
 		 case (EDROOMIRQsignal): 
 
-				if (*Msg->GetPInterface() == RxTC)
+				if (*Msg->GetPInterface() == RxTC
+					&& GNoFlight())
 				{
 
 					 edroomValidMsg=true;
@@ -398,7 +409,7 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 
 {
 
-return pus_service129_flight_plan_ready();
+return !pus_service129_flight_plan_ready();
 
 }
 
