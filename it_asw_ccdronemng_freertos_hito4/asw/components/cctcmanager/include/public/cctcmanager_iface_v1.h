@@ -413,11 +413,6 @@ public:
 		 */
 		bool	GToReboot();
 
-		/**
-		 * \brief 
-		 */
-		bool	GFlightDone();
-
 	};
 
 	// ***********************************************************************
@@ -434,13 +429,13 @@ public:
 
 		//! State Identifiers
 		enum TEDROOMStateID{StandBy,
-			inFlight};
+			Landed};
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
-			FlightDone,
-			Flight,
-			StartFlight,
+			Land,
+			EvAction,
+			InFlight,
 			EDROOMMemoryTrans };
 
 
@@ -481,7 +476,7 @@ public:
 		/**
 		 * \brief  
 		 */
-		bool	GStartFlight();
+		bool	GFlight();
 
 		/**
 		 * \brief 
@@ -537,13 +532,13 @@ public:
 
 		// ***********************************************************************
 
-		// Leaf SubState inFlight
+		// Leaf SubState Landed
 
 		// ***********************************************************************
 
 
 
-		TEDROOMTransId EDROOMinFlightArrival();
+		TEDROOMTransId EDROOMLandedArrival();
 
 	};
 
