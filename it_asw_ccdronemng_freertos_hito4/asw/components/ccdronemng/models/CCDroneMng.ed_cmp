@@ -1,0 +1,465 @@
+import "../../../dataclasses/CDTCHandler/models/CDTCHandler.ed_dclass";
+import "../../../dataclasses/CDDroneConfig/models/CDDroneConfig.ed_dclass";
+import "../../../dataclasses/Pr_Time/models/Pr_Time.ed_dclass";
+import "../../../protocols/CPDroneMngCtrl/models/CPDroneMngCtrl.ed_prot";
+import "../../../protocols/EDROOMTimingSAP/models/EDROOMTimingSAP.ed_prot";
+import "../../../protocols/EDROOMServiceLibrary/models/EDROOMServiceLibrary.ed_prot";
+import "../../../sais/pus_services_iface_v1/models/pus_services_iface_v1.ed_sai";
+
+
+
+/**
+ * \class   CCDroneMng
+ *
+ */
+
+
+reactive component CCDroneMng{
+
+	uri := es.uah.aut.srg.edroom.mclev.cmp.CCDroneMng;
+	version := v1;
+	stack_size := 1024;
+	def_max_nb_messages := 10;
+	requires := pus_services_iface(v1);
+
+
+
+
+	structure {
+
+		ports {
+
+
+			system port EDROOMsl
+			{
+				id:= 0;
+				protocol:= EDROOMServiceLibrary(v1);
+			};
+			timing port DroneTimer {
+				id := 1;
+				protocol := EDROOMTimingSAP(v1);
+
+			};
+
+			external port DroneMngCtrl {
+				id := 2;
+				cardinality := 1;
+				protocol := CPDroneMngCtrl(v1);
+
+			};
+
+
+
+		};
+
+
+	};
+
+
+	behaviour {
+
+		contexts {
+
+
+			context Top_0{
+
+
+				id := 0;
+
+
+				variables {
+					variable VNextCtrl{
+					 class := Pr_Time(v1);
+
+					 constructor := "";
+					 dimension := 0;
+					};
+
+
+				};
+
+
+				states {
+					state I{
+						id := 0;
+					};
+					state SelfTest{
+						id := 1;
+
+						exit actions := FDroneSelfTest;
+					};
+					state Ready{
+						id := 2;
+					};
+					state FlightPlan{
+						id := 3;
+					};
+				};
+
+
+				init state := I;
+
+
+				guards{
+
+					/**
+					 * \brief  
+					 */
+
+					guard GExecFlightPlan {
+						<code>
+						return pus_service129_flight_plan_ready();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GFlightPlanDone {
+						<code>
+						return pus_service129_flight_plan_done();
+
+
+						</code>
+
+					};
+
+
+				};
+
+
+				items{
+					/**
+					 * \brief  
+					 */
+
+					action FDroneSelfTest {
+						<code>
+						pus_service129_drone_selftest();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					msgdatahandler FExecDroneTC {
+						code {
+							<code>
+								
+									// Data access
+								
+								// ... =varSDroneTC;
+							 
+								varSDroneTC.ExecDroneTC();
+
+
+							</code>
+						};
+
+						port :=DroneMngCtrl;
+
+						message :=CPDroneMngCtrl(v1)::SDroneTC;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FFlightCtrlAlgorithm {
+						<code>
+						pus_service129_flight_ctrl_algorithm();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FFlightFinished {
+						code {
+							<code>
+
+
+							</code>
+						};
+
+						port :=DroneMngCtrl;
+
+						message :=CPDroneMngCtrl(v1)::SFlightFinished;
+
+						priority :=3;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					msgdatahandler FGetConfig {
+						code {
+							<code>
+								
+									// Data access
+								
+								// ... =varSDroneSetUp;
+							 
+								pus_service129_setup(varSDroneSetUp);
+
+
+							</code>
+						};
+
+						port :=DroneMngCtrl;
+
+						message :=CPDroneMngCtrl(v1)::SDroneSetUp;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					inform at FInitFlightPlan {
+						code {
+							<code>
+							 
+							time.GetTime(); // Get current monotonic time
+							time+=Pr_Time(0,100000); // Add X sec + Y microsec
+							VNextCtrl=time;
+							pus_service129_init_flight_plan();
+
+
+							</code>
+						};
+
+						port :=DroneTimer;
+
+						priority :=1;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					inform at FProgNextCtrl {
+						code {
+							<code>
+								 
+							VNextCtrl+= Pr_Time(0,100000); // Add X sec + Y microsec
+							time=VNextCtrl;
+							 
+
+
+							</code>
+						};
+
+						port :=DroneTimer;
+
+						priority :=1;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					reply FReplyDroneReady {
+						code {
+							<code>
+							pus_service129_drone_ready();
+
+
+							</code>
+						};
+
+						message :=CPDroneMngCtrl(v1)::SDroneReady;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FToReady {
+						<code>
+						pus_service129_drone_ready();
+
+
+						</code>
+
+					};
+
+
+				};
+
+
+				choice points{
+					choice point CtrlAlgorithm{
+
+
+						id := 0;
+
+
+						branches{
+
+							branch CtrlAlgorithm_PlanDone{
+								id := 0;
+								sink := Ready;
+
+
+								actions := FToReady;
+
+								sends := FFlightFinished;
+
+								guard := GFlightPlanDone;
+
+							};
+
+
+						};
+
+						default branch CtrlAlgorithm_ProgNextCtrl{
+							id := 1;
+							sink := FlightPlan;
+
+
+							actions := FProgNextCtrl;
+						};
+					};
+					choice point ExecTC{
+
+
+						id := 1;
+
+
+						branches{
+
+							branch ExecTC_InitFlightPlan{
+								id := 0;
+								sink := FlightPlan;
+
+
+								actions := FInitFlightPlan;
+
+								guard := GExecFlightPlan;
+
+							};
+
+
+						};
+
+						default branch ExecTC_WaitFP{
+							id := 1;
+							sink := Ready;
+
+						};
+					};
+				};
+
+
+				transitions{
+
+					transition Init{
+						id := 0;
+						source := I;
+						sink := SelfTest;
+
+
+
+						asynchronous trigger {
+							port := EDROOMsl;
+							message := EDROOMServiceLibrary(v1)::EDROOMStart;
+						};
+					};
+
+					transition Config{
+						id := 1;
+						source := SelfTest;
+						sink := Ready;
+
+
+						msgdatahandler := FGetConfig;
+
+						reply := FReplyDroneReady;
+
+
+						synchronous trigger {
+							port := DroneMngCtrl;
+							message := CPDroneMngCtrl(v1)::SDroneSetUp;
+						};
+					};
+
+					transition ExecTC{
+						id := 2;
+						source := Ready;
+						sink := ExecTC;
+
+
+						msgdatahandler := FExecDroneTC;
+
+
+						asynchronous trigger {
+							port := DroneMngCtrl;
+							message := CPDroneMngCtrl(v1)::SDroneTC;
+						};
+					};
+
+					transition CtrlAlgorithm{
+						id := 3;
+						source := FlightPlan;
+						sink := CtrlAlgorithm;
+
+
+						actions := FFlightCtrlAlgorithm;
+
+
+						asynchronous trigger {
+							port := DroneTimer;
+							message := EDROOMTimingSAP(v1)::EDROOMSignalTimeout;
+						};
+					};
+
+					transition ExecTCInFlight{
+						id := 4;
+						source := FlightPlan;
+						sink := FlightPlan;
+
+
+						msgdatahandler := FExecDroneTC;
+
+
+						asynchronous trigger {
+							port := DroneMngCtrl;
+							message := CPDroneMngCtrl(v1)::SDroneTC;
+						};
+					};
+
+
+				};
+
+
+			};
+
+
+		};
+
+		top context := Top_0;
+
+
+	};
+
+
+};

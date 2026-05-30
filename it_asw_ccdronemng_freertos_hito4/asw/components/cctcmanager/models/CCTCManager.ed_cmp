@@ -1,0 +1,799 @@
+import "../../../dataclasses/CDEvAction/models/CDEvAction.ed_dclass";
+import "../../../dataclasses/CDTCHandler/models/CDTCHandler.ed_dclass";
+import "../../../dataclasses/CDTCMemDescriptor/models/CDTCMemDescriptor.ed_dclass";
+import "../../../dataclasses/CDDroneConfig/models/CDDroneConfig.ed_dclass";
+import "../../../dataclasses/CDTCAcceptReport/models/CDTCAcceptReport.ed_dclass";
+import "../../../dataclasses/CDTCExecCtrl/models/CDTCExecCtrl.ed_dclass";
+import "../../../protocols/CPRxTC/models/CPRxTC.ed_prot";
+import "../../../protocols/CPHK_FDIRCtrl/models/CPHK_FDIRCtrl.ed_prot";
+import "../../../protocols/CPBKGExecCtrl/models/CPBKGExecCtrl.ed_prot";
+import "../../../protocols/CPDroneMngCtrl/models/CPDroneMngCtrl.ed_prot";
+import "../../../protocols/EDROOMServiceLibrary/models/EDROOMServiceLibrary.ed_prot";
+import "../../../sais/sc_channel_drv_v1/models/sc_channel_drv_v1.ed_sai";
+import "../../../sais/pus_services_iface_v1/models/pus_services_iface_v1.ed_sai";
+
+
+
+/**
+ * \class   CCTCManager
+ *
+ */
+
+
+proactive component CCTCManager{
+
+	uri := es.uah.aut.srg.edroom.mclev.cmp.CCTCManager;
+	version := v1;
+	stack_size := 4096;
+	def_max_nb_messages := 10;
+	requires := sc_channel_drv(v1),
+			pus_services_iface(v1);
+
+
+
+
+	structure {
+
+		ports {
+
+
+			system port EDROOMsl
+			{
+				id:= 0;
+				protocol:= EDROOMServiceLibrary(v1);
+			};
+			conjugated  external port DroneMngCtrl {
+				id := 1;
+				cardinality := 1;
+				protocol := CPDroneMngCtrl(v1);
+
+			};
+
+			conjugated  external port BKGExecCtrl {
+				id := 2;
+				cardinality := 1;
+				protocol := CPBKGExecCtrl(v1);
+
+			};
+
+			interrupt port RxTC {
+				id := 3;
+				irq vectors := 18;
+				data pool := CDTCMemDescriptor(v1)CDEDROOMPoolCDTCMemDescriptor[10];
+				protocol := CPRxTC(v1);
+
+				non_maskable := false;
+				enable_msg_to_component := true;
+				priority := 1;
+				enable_bottom_half := true;
+				top half {
+					<code>
+
+						#ifdef NEXYS_PLATFORM 
+						 
+						EDROOMIRQ18BottomHalfSignal=EDROOMVarIRQ18.HandleIRQ();
+						 
+						#endif
+
+					</code>
+				};
+				bottom half {
+					<code>
+
+						 
+						RxTC_RateCtrl();
+						 
+						SC_Channel_GetNextTC(EDROOMVarIRQ18);
+						 
+						SC_Channel_HandlePendingTCs();
+
+					</code>
+				};
+			};
+
+			conjugated  external port HK_FDIRCtrl {
+				id := 4;
+				cardinality := 1;
+				protocol := CPHK_FDIRCtrl(v1);
+
+			};
+
+
+
+		};
+
+
+		data pools {
+			CDTCHandler(v1) CEDROOMPoolCDTCHandler[10];
+			CDDroneConfig(v1) CEDROOMPoolCDDroneConfig[2];
+
+		};
+
+
+	};
+
+
+	behaviour {
+
+		contexts {
+
+
+			context Top_0{
+
+
+				id := 0;
+
+
+				variables {
+					variable VAcceptReport{
+					 class := CDTCAcceptReport(v1);
+
+					 constructor := "";
+					 dimension := 0;
+					};
+					variable VCurrentTC{
+					 class := CDTCHandler(v1);
+
+					 constructor := "";
+					 dimension := 0;
+					};
+					variable VTCExecCtrl{
+					 class := CDTCExecCtrl(v1);
+
+					 constructor := "";
+					 dimension := 0;
+					};
+
+
+				};
+
+
+				states {
+					state I{
+						id := 0;
+					};
+					state Ready{
+						id := 1;
+						context := Ready_1;
+					};
+					state Reboot{
+						id := 2;
+
+						entry actions := FReboot;
+					};
+				};
+
+
+				join points{
+
+					join point ValidTC{
+						id := 0;
+
+						output branch HandleTC{
+							id := 0;
+							sink := HandleTC;
+
+
+							actions := FTCExecCtrl;
+						};
+					};
+				};
+
+
+				init state := I;
+
+
+				guards{
+
+					/**
+					 * \brief  
+					 */
+
+					guard GAcceptTC {
+						<code>
+						return VAcceptReport.IsAccepted();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GFlightDone {
+						<code>
+						return pus_service129_flight_plan_done();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GFwdBKGTC {
+						<code>
+						return VTCExecCtrl.IsBKGTC();
+						 
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GFwdDroneTC {
+						<code>
+						return VTCExecCtrl.IsDroneTC();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GFwdToHK_FDIR {
+						<code>
+						return VTCExecCtrl.IsHK_FDIRTC();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					guard GToReboot {
+						<code>
+						return VTCExecCtrl.IsRebootTC();
+
+
+						</code>
+
+					};
+
+
+				};
+
+
+				items{
+					/**
+					 * \brief  
+					 */
+
+					action FExecPrioTC {
+						<code>
+						VCurrentTC.ExecPrioTC();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FExecRebootTC {
+						<code>
+						VCurrentTC.ExecRebootTC();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FFwdBKGTC {
+						code {
+							<code>
+								
+									// Complete Data 
+								
+								*pSBKGTC_Data=VCurrentTC;
+
+
+							</code>
+						};
+
+						port :=BKGExecCtrl;
+
+						message :=CPBKGExecCtrl(v1)::SBKGTC;
+
+						priority :=3;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FFwdDroneTC {
+						code {
+							<code>
+								
+									// Complete Data 
+								
+								*pSDroneTC_Data=VCurrentTC;
+
+
+							</code>
+						};
+
+						port :=DroneMngCtrl;
+
+						message :=CPDroneMngCtrl(v1)::SDroneTC;
+
+						priority :=3;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					send FFwdHK_FDIRTC {
+						code {
+							<code>
+								
+									// Complete Data 
+								
+							*pSHK_FDIR_TC_Data=VCurrentTC;   
+
+
+							</code>
+						};
+
+						port :=HK_FDIRCtrl;
+
+						message :=CPHK_FDIRCtrl(v1)::SHK_FDIR_TC;
+
+						priority :=3;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					msgdatahandler FGetEvAction {
+						code {
+							<code>
+							// Data access
+							 VCurrentTC=varSEvAction.GetActionTCHandler();
+
+
+							</code>
+						};
+
+						port :=HK_FDIRCtrl;
+
+						message :=CPHK_FDIRCtrl(v1)::SEvAction;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					msgdatahandler FGetTC {
+						code {
+							<code>
+									
+							//Set Descriptor	
+							VCurrentTC.BuildFromDescriptor(varEDROOMIRQsignal);
+							 
+							//Do Acception
+							VAcceptReport=VCurrentTC.DoAcceptation();
+
+
+							</code>
+						};
+
+						port :=RxTC;
+
+						message :=CPRxTC(v1)::EDROOMIRQsignal;
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FInit {
+						<code>
+						RxTC.MaskIRQ();
+						 
+						RxTC.InstallHandler();
+						 
+						pus_services_startup(&amp;RxTC);
+						 
+						RxTC.UnMaskIRQ();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FMngTCAcceptation {
+						<code>
+						 
+						VCurrentTC.MngTCAcceptation();
+						 
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FMngTCRejection {
+						<code>
+						 
+						 
+						VCurrentTC.MngTCRejection(VAcceptReport);
+						 
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FReboot {
+						<code>
+						pus_services_mng_reboot();
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					action FTCExecCtrl {
+						<code>
+						VTCExecCtrl=VCurrentTC.GetExecCtrl();
+
+
+						</code>
+
+					};
+
+
+				};
+
+
+				choice points{
+					choice point NewRxTC{
+
+
+						id := 0;
+
+
+						branches{
+
+							branch NewRxTC_Accepted{
+								id := 0;
+								sink := ValidTC;
+
+
+								actions := FMngTCAcceptation;
+
+								guard := GAcceptTC;
+
+							};
+
+
+						};
+
+						default branch NewRxTC_NotAccepted{
+							id := 1;
+							sink := Ready;
+
+
+							actions := FMngTCRejection;
+						};
+					};
+					choice point HandleTC{
+
+
+						id := 1;
+
+
+						branches{
+
+							branch HandleTC_ToReboot{
+								id := 0;
+								sink := Reboot;
+
+
+								actions := FExecRebootTC;
+
+								guard := GToReboot;
+
+							};
+
+							branch HandleTC_FwdHK_FDIRTC{
+								id := 1;
+								sink := Ready;
+
+
+								sends := FFwdHK_FDIRTC;
+
+								guard := GFwdToHK_FDIR;
+
+							};
+
+							branch HandleTC_FwdBKGTC{
+								id := 2;
+								sink := Ready;
+
+
+								sends := FFwdBKGTC;
+
+								guard := GFwdBKGTC;
+
+							};
+
+							branch HandleTC_FwdDroneTC{
+								id := 3;
+								sink := Ready;
+
+
+								sends := FFwdDroneTC;
+
+								guard := GFwdDroneTC;
+
+							};
+
+
+						};
+
+						default branch HandleTC_ExecPrioTC{
+							id := 4;
+							sink := Ready;
+
+
+							actions := FExecPrioTC;
+						};
+					};
+				};
+
+
+				transitions{
+
+					transition Init{
+						id := 0;
+						source := I;
+						sink := Ready;
+
+
+						actions := FInit;
+
+
+						asynchronous trigger {
+							port := any ;
+							message := CPHK_FDIRCtrl(v1)::SEvAction;
+						};
+					};
+
+					transition NewRxTC{
+						id := 1;
+						source := Ready;
+						sink := NewRxTC;
+
+
+						msgdatahandler := FGetTC;
+
+
+						asynchronous trigger {
+							port := RxTC;
+							message := CPRxTC(v1)::EDROOMIRQsignal;
+						};
+					};
+
+					transition NewEvAction{
+						id := 3;
+						source := Ready;
+						sink := ValidTC;
+
+
+						msgdatahandler := FGetEvAction;
+
+
+						asynchronous trigger {
+							port := HK_FDIRCtrl;
+							message := CPHK_FDIRCtrl(v1)::SEvAction;
+						};
+					};
+
+
+				};
+
+
+			};
+
+
+			context Ready_1{
+
+
+				id := 1;
+
+
+				states {
+					state StandBy{
+						id := 0;
+					};
+					state InFlight{
+						id := 1;
+					};
+				};
+
+
+				guards{
+
+					/**
+					 * \brief  
+					 */
+
+					guard GInFlight {
+						<code>
+						return !pus_service129_flight_plan_done();
+
+
+						</code>
+
+					};
+
+
+				};
+
+
+				items{
+					/**
+					 * \brief  
+					 */
+
+					action FInFlightPlan {
+						<code>
+						CDTCHandler &amp; varEDROOMIRQsignal = *(CDTCHandler *)Msg-&gt;data;
+						CDTCAcceptReport acceptReport;
+						varEDROOMIRQsignal.MngTCRejectionInFlight(acceptReport);
+
+
+						</code>
+
+					};
+
+					/**
+					 * \brief  
+					 */
+
+					invoke FInvokeDroneSetUp {
+						code {
+							<code>
+									
+							pSDroneSetUp_Data-&gt;ZMinBeforeAdvance=10;
+							pSDroneSetUp_Data-&gt;DefaultKp=0.2;
+							pSDroneSetUp_Data-&gt;DefaultKi=0.15;
+							pSDroneSetUp_Data-&gt;DefaultKd=0.05;
+
+
+							</code>
+						};
+
+						port :=DroneMngCtrl;
+
+						message :=CPDroneMngCtrl(v1)::SDroneSetUp;
+
+						priority :=1;
+
+					};
+
+
+				};
+
+
+				transitions{
+
+					transition InvokeDroneSetUp{
+						id := 0;
+						source := Init_EntryP;
+						sink := StandBy;
+
+
+						handshakes{
+							handshake{
+								invoke := FInvokeDroneSetUp;
+							};
+						};
+					};
+
+					transition StartFlight{
+						id := 1;
+						source := StandBy;
+						sink := InFlight;
+
+
+						actions := FInFlightPlan;
+
+
+						asynchronous trigger {
+							port := RxTC;
+							message := CPRxTC(v1)::EDROOMIRQsignal;
+							guard := GInFlight;
+						};
+					};
+
+					transition Flying{
+						id := 2;
+						source := InFlight;
+						sink := InFlight;
+
+
+						actions := FInFlightPlan;
+
+
+						asynchronous trigger {
+							port := RxTC;
+							message := CPRxTC(v1)::EDROOMIRQsignal;
+						};
+					};
+
+					transition FlightDone{
+						id := 3;
+						source := InFlight;
+						sink := StandBy;
+
+
+
+						asynchronous trigger {
+							port := DroneMngCtrl;
+							message := CPDroneMngCtrl(v1)::SFlightFinished;
+						};
+					};
+
+
+				};
+
+
+			};
+
+
+		};
+
+		top context := Top_0;
+
+
+	};
+
+
+};
