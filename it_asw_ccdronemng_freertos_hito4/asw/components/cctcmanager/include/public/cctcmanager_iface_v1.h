@@ -413,6 +413,11 @@ public:
 		 */
 		bool	GToReboot();
 
+		/**
+		 * \brief 
+		 */
+		bool	GFlightDone();
+
 	};
 
 	// ***********************************************************************
@@ -477,6 +482,11 @@ public:
 		 * \brief  
 		 */
 		bool	GStartFlight();
+
+		/**
+		 * \brief 
+		 */
+		bool	GFlightDone();
 
 	};
 

@@ -281,6 +281,16 @@ return VTCExecCtrl.IsRebootTC();
 
 
 
+bool	CCTCManager::EDROOM_CTX_Top_0::GFlightDone()
+
+{
+
+return pus_service129_flight_plan_done();
+
+}
+
+
+
 // ***********************************************************************
 
 // class EDROOM_CTX_Ready_1
@@ -319,7 +329,8 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 
 		 case (EDROOMIRQsignal): 
 
-				if (*Msg->GetPInterface() == RxTC)
+				if (*Msg->GetPInterface() == RxTC
+					&& GFlightDone())
 				{
 
 					 edroomValidMsg=true;
@@ -399,6 +410,16 @@ bool	CCTCManager::EDROOM_CTX_Ready_1::GStartFlight()
 {
 
 return !pus_service129_flight_plan_done();
+
+}
+
+
+
+bool	CCTCManager::EDROOM_CTX_Ready_1::GFlightDone()
+
+{
+
+return pus_service129_flight_plan_done();
 
 }
 
@@ -961,9 +982,10 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMinFlightArrival()
 		switch(Msg->signal)
 		{
 
-			case (SFlightFinished): 
+			case (EDROOMIRQsignal): 
 
-				 if (*Msg->GetPInterface() == DroneMngCtrl)
+				 if (*Msg->GetPInterface() == RxTC
+					&& GFlightDone())
 				{
 
 					//Next transition is  FlightDone
@@ -972,11 +994,7 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMinFlightArrival()
 					edroomValidMsg=true;
 				 }
 
-				break;
-
-			case (EDROOMIRQsignal): 
-
-				 if (*Msg->GetPInterface() == RxTC)
+				 else if (*Msg->GetPInterface() == RxTC)
 				{
 
 					//Next transition is  Flight
