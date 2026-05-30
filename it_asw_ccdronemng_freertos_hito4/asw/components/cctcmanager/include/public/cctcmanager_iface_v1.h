@@ -434,7 +434,6 @@ public:
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
 			Land,
-			EvAction,
 			InFlight,
 			EDROOMMemoryTrans };
 
