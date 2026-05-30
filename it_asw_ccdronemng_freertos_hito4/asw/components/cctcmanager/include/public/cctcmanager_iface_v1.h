@@ -434,14 +434,13 @@ public:
 
 		//! State Identifiers
 		enum TEDROOMStateID{StandBy,
-			SubEstado1};
+			InFlight};
 
 		//!Transition Identifiers
 		enum TEDROOMTransitionID{InvokeDroneSetUp,
-			Transicion1,
-			Transicion2,
-			Transicion3,
-			Transicion4,
+			StartFlight,
+			Flying,
+			FlightDone,
 			EDROOMMemoryTrans };
 
 
@@ -472,15 +471,15 @@ public:
 		/**
 		 * \brief  
 		 */
-		void	FInvokeDroneSetUp();
-
-		/**
-		 * \brief 
-		 */
 		void	FInFlightPlan();
 
 		/**
-		 * \brief 
+		 * \brief  
+		 */
+		void	FInvokeDroneSetUp();
+
+		/**
+		 * \brief  
 		 */
 		bool	GInFlight();
 
@@ -533,13 +532,13 @@ public:
 
 		// ***********************************************************************
 
-		// Leaf SubState SubEstado1
+		// Leaf SubState InFlight
 
 		// ***********************************************************************
 
 
 
-		TEDROOMTransId EDROOMSubEstado1Arrival();
+		TEDROOMTransId EDROOMInFlightArrival();
 
 	};
 
