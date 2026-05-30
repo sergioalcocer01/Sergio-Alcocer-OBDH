@@ -291,6 +291,18 @@ return pus_service129_flight_plan_done();
 
 
 
+void	CCTCManager::EDROOM_CTX_Top_0::FInFlightPlan()
+
+{
+
+CDTCHandler & varEDROOMIRQsignal = *(CDTCHandler *)Msg->data;
+CDTCAcceptReport acceptReport;
+varEDROOMIRQsignal.MngTCRejectionInFlight(acceptReport);
+
+}
+
+
+
 // ***********************************************************************
 
 // class EDROOM_CTX_Ready_1
@@ -338,6 +350,28 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 					edroomCurrentTrans.distanceToContext = 1 ;
 				 }
 
+				else if (*Msg->GetPInterface() == RxTC)
+				{
+
+					 edroomValidMsg=true;
+					edroomCurrentTrans.localId = EDROOM_CTX_Top_0::Fly;
+					edroomCurrentTrans.distanceToContext = 1 ;
+				 }
+
+			 break;
+
+		// Check trigger for signal SEvAction
+
+		 case (SEvAction): 
+
+				if (*Msg->GetPInterface() == HK_FDIRCtrl)
+				{
+
+					 edroomValidMsg=true;
+					edroomCurrentTrans.localId = EDROOM_CTX_Top_0::NewEvAction;
+					edroomCurrentTrans.distanceToContext = 1 ;
+				 }
+
 			 break;
 
 	}
@@ -360,20 +394,6 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 
 	// User-defined Functions   ****************************
 
-void	CCTCManager::EDROOM_CTX_Ready_1::FInFlightPlan()
-
-{
-
-CDTCHandler & varEDROOMIRQsignal = *(CDTCHandler *)Msg->data;
- 
-CDTCAcceptReport acceptReport;
- 
-varEDROOMIRQsignal.MngTCRejectionInFlight(acceptReport);
-
-}
-
-
-
 void	CCTCManager::EDROOM_CTX_Ready_1::FInvokeDroneSetUp()
 
 {
@@ -387,26 +407,6 @@ pSDroneSetUp_Data->DefaultKd=0.05;
    //Invoke synchronous communication 
    MsgBack=DroneMngCtrl.invoke(SDroneSetUp,pSDroneSetUp_Data,
                                                      &EDROOMPoolCDDroneConfig); 
-}
-
-
-
-bool	CCTCManager::EDROOM_CTX_Ready_1::GFlight()
-
-{
-
-return !pus_service129_flight_plan_done();
-
-}
-
-
-
-bool	CCTCManager::EDROOM_CTX_Ready_1::GFlightDone()
-
-{
-
-return pus_service129_flight_plan_done();
-
 }
 
 
@@ -537,6 +537,23 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				//Next State is ValidTC
 				edroomNextState = ValidTC;
 				break;
+			//Next Transition is Fly
+			case (Fly):
+				//Next State is Flight
+				edroomNextState = Flight;
+				break;
+			//Next Transition is Landed
+			case (Landed):
+				//Next State is Ready
+				edroomNextState = Ready;
+				break;
+			//Next Transition is Flight
+			case (Flight):
+				//Execute Action 
+				FInFlightPlan();
+				//Next State is Flight
+				edroomNextState = Flight;
+				break;
 			//To Choice Point HandleTC
 			case (HandleTC):
 
@@ -641,6 +658,12 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				edroomCurrentTrans=EDROOMValidTCArrival();
 				break;
 
+				//Go to the state Flight
+			case (Flight):
+				//Arrival to state Flight
+				edroomCurrentTrans=EDROOMFlightArrival();
+				break;
+
 		}
 
 		edroomCurrentState=edroomNextState;
@@ -741,6 +764,68 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMRebootArrival()
 
 
 
+	// ***********************************************************************
+
+	// Leaf SubState  Flight
+
+	// ***********************************************************************
+
+
+
+TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMFlightArrival()
+{
+
+	TEDROOMTransId edroomCurrentTrans;
+
+	bool edroomValidMsg=false;
+
+	do
+	{
+
+		EDROOMNewMessage ();
+
+		switch(Msg->signal)
+		{
+
+			case (EDROOMIRQsignal): 
+
+				 if (*Msg->GetPInterface() == RxTC
+					&& GFlightDone())
+				{
+
+					//Next transition is  Landed
+					edroomCurrentTrans.localId= Landed;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				 else if (*Msg->GetPInterface() == RxTC)
+				{
+
+					//Next transition is  Flight
+					edroomCurrentTrans.localId= Flight;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				break;
+
+		};
+
+		if (false == edroomValidMsg)
+		{
+			 edroomValidMsg = EDROOMSearchContextTrans(edroomCurrentTrans);
+
+		}
+
+	} while (false == edroomValidMsg);
+
+	return(edroomCurrentTrans);
+
+}
+
+
+
 // ***********************************************************************
 
 // class EDROOM_SUB_Ready_1
@@ -766,8 +851,6 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 {
 
 	TEDROOMTransId edroomCurrentTrans;
-
-	int edroomContextExit=0;
 
 	//Transition at Context Entry
 	switch (arrivingTrans)
@@ -805,6 +888,11 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 		//Invoke Synchronous Message 
 		FInvokeDroneSetUp();
 			break;
+		case (EDROOM_CTX_Top_0::Landed):
+			//Memory Entry 
+			edroomCurrentTrans.localId = EDROOMMemoryTrans ;
+			edroomNextState = edroomCurrentState;
+			break;
 		case (EDROOM_CTX_Top_0::EDROOMMemoryTrans):
 			//Memory Entry added
 			edroomCurrentTrans.localId = EDROOMMemoryTrans ;
@@ -817,9 +905,6 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 			break;
 	}
 
-	do
-	{
-
 		//Entry into the Next State 
 		switch(edroomNextState)
 		{
@@ -830,52 +915,9 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 				edroomCurrentTrans=EDROOMStandByArrival();
 				break;
 
-				//Go to the state Landed
-			case (Landed):
-				//Arrival to state Landed
-				edroomCurrentTrans=EDROOMLandedArrival();
-				break;
-
 		}
 
 		edroomCurrentState=edroomNextState;
-
-		if (edroomCurrentTrans.distanceToContext == 0)
-		{
-
-			switch (edroomCurrentTrans.localId)
-			{
-
-				case (Land):
-					//Go to the state Landed
-					edroomNextState = Landed;
-					edroomContextExit=0;
-					break;
-
-				case (InFlight):
-				//Execute Action 
-				FInFlightPlan();
-					//Go to the state StandBy
-					edroomNextState = StandBy;
-					edroomContextExit=0;
-					break;
-
-				case (Transicion3):
-					//Exit across the exit point NewEvAction
-					edroomCurrentTrans.localId= 
-						EDROOM_CTX_Top_0::NewEvAction;
-					edroomCurrentTrans.distanceToContext= 1;
-					edroomContextExit=1;
-					break;
-
-			}
-
-		}else
-		{
-			edroomContextExit=1;
-		}
-
-	}while(0 == edroomContextExit);
 
 	edroomCurrentTrans.distanceToContext--;
 
@@ -903,82 +945,6 @@ void CCTCManager::EDROOM_SUB_Ready_1::EDROOMInit()
 
 
 TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMStandByArrival()
-{
-
-	TEDROOMTransId edroomCurrentTrans;
-
-	bool edroomValidMsg=false;
-
-	do
-	{
-
-		EDROOMNewMessage ();
-
-		switch(Msg->signal)
-		{
-
-			case (EDROOMIRQsignal): 
-
-				 if (*Msg->GetPInterface() == RxTC
-					&& GFlightDone())
-				{
-
-					//Next transition is  Land
-					edroomCurrentTrans.localId= Land;
-					edroomCurrentTrans.distanceToContext = 0;
-					edroomValidMsg=true;
-				 }
-
-				 else if (*Msg->GetPInterface() == RxTC
-					&& GFlight())
-				{
-
-					//Next transition is  InFlight
-					edroomCurrentTrans.localId= InFlight;
-					edroomCurrentTrans.distanceToContext = 0;
-					edroomValidMsg=true;
-				 }
-
-				break;
-
-			case (SEvAction): 
-
-				 if (*Msg->GetPInterface() == HK_FDIRCtrl)
-				{
-
-					//Next transition is  Transicion3
-					edroomCurrentTrans.localId= Transicion3;
-					edroomCurrentTrans.distanceToContext = 0;
-					edroomValidMsg=true;
-				 }
-
-				break;
-
-		};
-
-		if (false == edroomValidMsg)
-		{
-			 edroomValidMsg = EDROOMSearchContextTrans(edroomCurrentTrans);
-
-		}
-
-	} while (false == edroomValidMsg);
-
-	return(edroomCurrentTrans);
-
-}
-
-
-
-	// ***********************************************************************
-
-	// Leaf SubState  Landed
-
-	// ***********************************************************************
-
-
-
-TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMLandedArrival()
 {
 
 	TEDROOMTransId edroomCurrentTrans;
