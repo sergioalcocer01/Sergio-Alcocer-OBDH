@@ -916,8 +916,7 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMStandByArrival()
 					edroomValidMsg=true;
 				 }
 
-				 else if (*Msg->GetPInterface() == RxTC
-					&& GFlight())
+				 else if (*Msg->GetPInterface() == RxTC)
 				{
 
 					//Next transition is  InFlight
