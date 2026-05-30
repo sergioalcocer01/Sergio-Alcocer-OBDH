@@ -281,6 +281,16 @@ return VTCExecCtrl.IsRebootTC();
 
 
 
+bool	CCTCManager::EDROOM_CTX_Top_0::GFlightDone()
+
+{
+
+return pus_service129_flight_plan_done();
+
+}
+
+
+
 // ***********************************************************************
 
 // class EDROOM_CTX_Ready_1
@@ -319,25 +329,12 @@ bool CCTCManager::EDROOM_CTX_Ready_1::EDROOMSearchContextTrans(
 
 		 case (EDROOMIRQsignal): 
 
-				if (*Msg->GetPInterface() == RxTC)
+				if (*Msg->GetPInterface() == RxTC
+					&& GFlightDone())
 				{
 
 					 edroomValidMsg=true;
 					edroomCurrentTrans.localId = EDROOM_CTX_Top_0::NewRxTC;
-					edroomCurrentTrans.distanceToContext = 1 ;
-				 }
-
-			 break;
-
-		// Check trigger for signal SEvAction
-
-		 case (SEvAction): 
-
-				if (*Msg->GetPInterface() == HK_FDIRCtrl)
-				{
-
-					 edroomValidMsg=true;
-					edroomCurrentTrans.localId = EDROOM_CTX_Top_0::NewEvAction;
 					edroomCurrentTrans.distanceToContext = 1 ;
 				 }
 
@@ -863,6 +860,14 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::Arrival(
 					edroomContextExit=0;
 					break;
 
+				case (Transicion3):
+					//Exit across the exit point NewEvAction
+					edroomCurrentTrans.localId= 
+						EDROOM_CTX_Top_0::NewEvAction;
+					edroomCurrentTrans.distanceToContext= 1;
+					edroomContextExit=1;
+					break;
+
 			}
 
 		}else
@@ -930,6 +935,19 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Ready_1::EDROOMStandByArrival()
 
 					//Next transition is  InFlight
 					edroomCurrentTrans.localId= InFlight;
+					edroomCurrentTrans.distanceToContext = 0;
+					edroomValidMsg=true;
+				 }
+
+				break;
+
+			case (SEvAction): 
+
+				 if (*Msg->GetPInterface() == HK_FDIRCtrl)
+				{
+
+					//Next transition is  Transicion3
+					edroomCurrentTrans.localId= Transicion3;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
