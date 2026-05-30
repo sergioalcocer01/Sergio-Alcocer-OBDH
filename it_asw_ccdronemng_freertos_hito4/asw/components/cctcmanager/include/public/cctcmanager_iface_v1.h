@@ -269,7 +269,7 @@ public:
 			NewEvAction,
 			Fly,
 			Landed,
-			Flight,
+			InFlight,
 			EDROOMMemoryTrans };
 
 

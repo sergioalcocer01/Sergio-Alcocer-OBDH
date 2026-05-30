@@ -547,8 +547,8 @@ void CCTCManager::EDROOM_SUB_Top_0::EDROOMBehaviour()
 				//Next State is Ready
 				edroomNextState = Ready;
 				break;
-			//Next Transition is Flight
-			case (Flight):
+			//Next Transition is InFlight
+			case (InFlight):
 				//Execute Action 
 				FInFlightPlan();
 				//Next State is Flight
@@ -802,8 +802,8 @@ TEDROOMTransId CCTCManager::EDROOM_SUB_Top_0::EDROOMFlightArrival()
 				 else if (*Msg->GetPInterface() == RxTC)
 				{
 
-					//Next transition is  Flight
-					edroomCurrentTrans.localId= Flight;
+					//Next transition is  InFlight
+					edroomCurrentTrans.localId= InFlight;
 					edroomCurrentTrans.distanceToContext = 0;
 					edroomValidMsg=true;
 				 }
